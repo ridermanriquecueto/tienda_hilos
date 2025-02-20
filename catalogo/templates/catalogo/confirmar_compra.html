@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmación de Compra</title>
+    <script>
+        // Función que muestra u oculta los campos dependiendo del método de pago seleccionado
+        function mostrarCamposPago() {
+            var metodo_pago = document.getElementById('metodo_pago').value;
+            
+            // Ocultar ambos campos al inicio
+            document.getElementById('campo_alias_mercado_pago').style.display = 'none';
+            document.getElementById('campo_numero_tarjeta').style.display = 'none';
+            
+            // Mostrar los campos correspondientes dependiendo del método de pago
+            if (metodo_pago == 'mercado_pago') {
+                document.getElementById('campo_alias_mercado_pago').style.display = 'block';
+            } else if (metodo_pago == 'cuenta_dni') {
+                document.getElementById('campo_numero_tarjeta').style.display = 'block';
+            }
+        }
+
+        // Llamamos a la función para mostrar los campos al cargar la página
+        window.onload = function() {
+            mostrarCamposPago();
+        };
+    </script>
+</head>
+<body>
+    <h1>Confirmación de Compra</h1>
+
+    {% if carrito %}
+        <h2>Resumen de tu compra:</h2>
+        <ul>
+            {% for producto in carrito.productos.all %}
+                <li>{{ producto.nombre }} - {{ producto.cantidad }} x {{ producto.precio }} = {{ producto.cantidad * producto.precio }}</li>
+            {% endfor %}
+        </ul>
+        <p>Total: ${{ total }}</p>
+        <p>Gracias por tu compra.</p>
+    {% else %}
+        <p>No tienes productos en tu carrito.</p>
+    {% endif %}
+    
+    <form method="POST" action="{% url 'catalogo:confirmar_compra' %}">
+        {% csrf_token %}
+        
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br>
+    
+        <label for="direccion">Dirección:</label>
+        <input type="text" id="direccion" name="direccion" required><br>
+    
+        <label for="telefono">Teléfono:</label>
+        <input type="text" id="telefono" name="telefono" required><br>
+    
+        <label for="metodo_pago">Método de Pago:</label>
+        <select id="metodo_pago" name="metodo_pago" required onchange="mostrarCamposPago()">
+            <option value="mercado_pago">Mercado Pago</option>
+            <option value="cuenta_dni">Cuenta DNI</option>
+            <option value="transferencia">Transferencia</option>
+        </select><br>
+    
+        <!-- Campos para métodos de pago específicos -->
+        <div id="campo_alias_mercado_pago" style="display: none;">
+            <label for="alias_mercado_pago">Alias Mercado Pago:</label>
+            <input type="text" id="alias_mercado_pago" name="alias_mercado_pago"><br>
+        </div>
+    
+        <div id="campo_numero_tarjeta" style="display: none;">
+            <label for="numero_tarjeta">Número de tarjeta:</label>
+            <input type="text" id="numero_tarjeta" name="numero_tarjeta"><br>
+        </div>
+    
+        <label for="metodo_envio">Método de Envío:</label>
+        <select id="metodo_envio" name="metodo_envio">
+            <option value="domicilio">Domicilio</option>
+            <option value="retiro_en_tienda">Retiro en tienda</option>
+        </select><br>
+    
+        <input type="submit" value="Confirmar Compra">
+    </form>
+</body>
+</html>

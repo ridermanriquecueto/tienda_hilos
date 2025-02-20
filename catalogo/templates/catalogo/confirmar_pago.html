@@ -1,0 +1,6 @@
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="comprobante">Comprobante de pago:</label>
+    <input type="file" name="comprobante" id="comprobante" required>
+    <button type="submit">Confirmar pago</button>
+</form>

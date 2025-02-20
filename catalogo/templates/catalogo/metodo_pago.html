@@ -1,0 +1,18 @@
+<h1>Resumen de Compra</h1>
+<table>
+    <tr>
+        <th>Producto</th>
+        <th>Precio</th>
+        <th>Cantidad</th>
+        <th>Total</th>
+    </tr>
+    {% for producto_id, item in carrito.items %}
+    <tr>
+        <td>{{ item.nombre }}</td>
+        <td>${{ item.precio }}</td>
+        <td>{{ item.cantidad }}</td>
+        <td>${{ item.precio|floatformat:2|multiply:item.cantidad }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<button onclick="realizarPago()">Realizar Pago</button>

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Inicio - La Casa de Hilos y Repuestos{% endblock %}
+
+{% block content %}
+
+<section id="hero">
+    <h2>Bienvenido a la mejor tienda de hilos y repuestos para toda confección</h2>
+    <p>Descubre nuestra amplia variedad de productos de alta calidad para todas tus necesidades de costura.</p>
+
+    <div class="formulario-inicio">
+        <div class="icons-container">
+            <a href="https://wa.me/542216769436" target="_blank" class="whatsapp-icon">
+                <img src="{% static 'images/whatsapp-64.webp' %}" alt="WhatsApp">
+            </a>
+            <a href="{% url 'carrito' %}" class="cart-icon">
+                <img src="{% static 'images/carro.jpg' %}" alt="Carrito de Compras">
+            </a>
+            <div class="map-icon">
+                <a href="https://maps.google.com/maps?q=-34.9200676%2C-58.0028568&z=17&hl=es" target="_blank">
+                    <button>Cómo llegar</button>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <p>
+        <a href="{% url 'catalogo' %}">Ver Catálogo</a>  <!-- Debe coincidir con el nombre en urls.py -->
+
+    </p>
+</section>
+
+{% endblock %}

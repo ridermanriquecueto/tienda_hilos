@@ -1,0 +1,41 @@
+<form method="post">
+    {% csrf_token %}
+    
+    <label for="id_nombre">Nombre:</label>
+    {{ form.nombre }}
+
+    <label for="id_direccion">Dirección:</label>
+    {{ form.direccion }}
+
+    <label for="id_metodo_pago">Método de Pago:</label>
+    {{ form.metodo_pago }}
+
+    <div id="instrucciones_cuenta_dni" style="display: none; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">
+        <p><strong>Instrucciones para pagar con Cuenta DNI:</strong></p>
+        <ul>
+            <li>Enviar el pago al alias: <strong>mi-negocio.cuenta.dni</strong></li>
+            <li>Una vez hecho el pago, envía el comprobante por WhatsApp.</li>
+            <li>Confirmaremos tu pago antes de procesar el envío.</li>
+        </ul>
+    </div>
+
+    <label for="id_metodo_envio">Método de Envío:</label>
+    {{ form.metodo_envio }}
+
+    <button type="submit">Realizar Pedido</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let metodoPagoSelect = document.getElementById("id_metodo_pago");
+        let instrucciones = document.getElementById("instrucciones_cuenta_dni");
+
+        metodoPagoSelect.addEventListener("change", function () {
+            if (metodoPagoSelect.value === "cuenta_dni") {
+                instrucciones.style.display = "block";
+            } else {
+                instrucciones.style.display = "none";
+            }
+        });
+    });
+</script>

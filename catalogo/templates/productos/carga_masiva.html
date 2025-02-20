@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Carga Masiva de Productos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Cargar Productos desde CSV</h2>
+            
+            <!-- Mostrar mensajes de éxito o error -->
+            {% if messages %}
+                <div class="mt-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+            <!-- Enlace para listar productos -->
+            <a href="{% url 'productos:listar_productos' %}" class="btn btn-secondary mb-3">Listar Productos</a>
+
+            <!-- Formulario para cargar archivo CSV -->
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="csv_file">Archivo CSV</label>
+                    <input type="file" class="form-control" id="csv_file" name="csv_file" required>
+                    <small class="form-text text-muted">
+                        El archivo debe estar en formato CSV y no superar los 2 MB.
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Cargar</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

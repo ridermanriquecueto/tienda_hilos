@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Tu Carrito</h2>
+
+{% if items %}
+    {% if mensaje_stock %}
+    <div class="alerta-stock">
+        <p>{{ mensaje_stock }}</p>
+    </div>
+    {% endif %}
+
+    <table class="tabla-carrito">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio Unitario</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.producto.nombre }}</td>
+                <td>${{ item.producto.precio|floatformat:2 }}</td> <!-- Formateo de precio -->
+                <td>
+                    <form action="{% url 'actualizar_carrito' producto_id=item.producto.id %}" method="POST" class="form-actualizar">
+                        {% csrf_token %}
+                        <input type="number" name="cantidad" value="{{ item.cantidad }}" min="1" max="{{ item.producto.stock }}" class="input-cantidad">
+                        <button type="submit" class="btn-actualizar">Actualizar</button>
+                    </form>
+                </td>
+                <td>${{ item.subtotal|floatformat:2 }}</td> <!-- Formateo de subtotal -->
+                <td>
+                    <!-- Opción para eliminar una unidad -->
+                    <a href="{% url 'eliminar_del_carrito' producto_id=item.producto.id eliminar_todo=0 %}" class="btn-eliminar">Eliminar 1</a>
+                    
+                    <!-- Opción para eliminar todo el producto del carrito -->
+                    <a href="{% url 'eliminar_del_carrito' producto_id=item.producto.id eliminar_todo=1 %}" class="btn-eliminar-todo">Eliminar todo</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3>Total de productos: {{ total_productos }}</h3> <!-- Mostrar el total de productos -->
+    <h3>Total: ${{ total|floatformat:2 }}</h3> <!-- Total con formato -->
+
+    <!-- Botones para finalizar la compra y volver al catálogo -->
+    <div class="botones">
+        <a href="{% url 'checkout' %}" class="btn">Finalizar Compra</a>
+        <a href="{% url 'catalogo' %}" class="btn">Volver al Catálogo</a>
+    </div>
+{% else %}
+    <p>No tienes productos en tu carrito.</p>
+    <a href="{% url 'catalogo' %}" class="btn">Volver al Catálogo</a>
+{% endif %}
+{% endblock %}

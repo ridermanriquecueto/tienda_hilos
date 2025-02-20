@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmación de Orden{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>¡Gracias por tu compra, {{ orden.carrito.usuario.username }}!</h2>
+    <p>Tu orden ha sido creada con éxito.</p>
+    <p><strong>Detalles de la orden:</strong></p>
+    <ul>
+        <li><strong>Fecha de creación:</strong> {{ orden.fecha_creacion }}</li>
+        <li><strong>Total:</strong> ${{ orden.total }}</li>
+        <li><strong>Metodo de pago:</strong> {{ orden.get_metodo_pago_display }}</li>
+        <li><strong>Metodo de envío:</strong> {{ orden.get_metodo_envio_display }}</li>
+        <li><strong>Estado:</strong> {{ orden.get_estado_display }}</li>
+    </ul>
+
+    <h3>Productos:</h3>
+    <ul>
+        {% for item in orden.carrito.itemcarrito_set.all %}
+        <li>{{ item.producto.nombre }} - {{ item.cantidad }} unidades</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

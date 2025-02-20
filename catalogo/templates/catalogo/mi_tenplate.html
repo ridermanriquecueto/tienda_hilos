@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Productos</title>
+</head>
+<body>
+    <h1>Productos</h1>
+    <ul>
+        {% for producto in productos %}
+            <li>
+                {{ producto.nombre }} - 
+                <a href="{% url 'actualizar_producto' producto.pk %}">Actualizar Producto</a>
+
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

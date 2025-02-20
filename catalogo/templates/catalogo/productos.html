@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Productos - La Casa de Hilos y Repuestos{% endblock %}
+
+{% block content %}
+
+<section id="productos">
+
+    
+    <h1>Bienvenidos a Mi Tienda de Hilos</h1>
+    <p>Encuentra los mejores hilos y accesorios para todas tus necesidades de costura.</p>
+    <!-- Menú desplegable para agregar la carga masiva de productos -->
+   
+
+    <div class="menu-desplegable">
+        <button id="menuToggle" class="btn btn-secondary">Opciones de Productos</button>
+        <div id="menuOpciones" class="menu-contenido" style="display: none;">
+            <a href="#">Ver todos los productos</a>
+            <!-- Opción de carga masiva -->
+            <a href="#" id="cargarCsvBtn">Cargar Productos desde CSV</a>
+        </div>
+    </div>
+
+    <!-- Formulario para la carga masiva de productos desde CSV (oculto por defecto) -->
+    <div id="cargarCsvForm" style="display:none; margin-top: 20px;">
+        <form method="POST" enctype="multipart/form-data" action="{% url 'cargar_csv' %}">
+            {% csrf_token %}
+            <label for="csv_file">Selecciona un archivo CSV:</label>
+            <input type="file" name="csv_file" accept=".csv" required>
+            <button type="submit" class="btn btn-success">Cargar</button>
+        </form>
+    </div>
+    <div class="productos">
+        <div class="producto">
+            <h3>Hilo de Algodón</h3>
+            <img src="{% static 'images/Hilo1.jpg' %}" alt="Hilo 1">
+            <p class="precio" id="precio1" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio1')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Hilo de Seda para overlock</h3>
+            <img src="{% static 'images/Hilo2.jpg' %}" alt="Hilo 2">
+            <p class="precio" id="precio2" data-precio="2300" >
+            <button onclick="agregarAlCarrito(2300, 'precio2')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Aguja Recta</h3>
+            <img src="{% static 'images/aguja-recta.jpg' %}" alt="Aguja Recta">
+            <p class="precio" id="precio3" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio3')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Aguja Overlock</h3>
+            <img src="{% static 'images/aguja-overlock.jpg' %}" alt="Aguja Overlock">
+            <p class="precio" id="precio4" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio4')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Aguja Collareta</h3>
+            <img src="{% static 'images/aguja-collareta.jpg' %}" alt="Aguja Collareta">
+            <p class="precio" id="precio5" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio5')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Aguja Botonera</h3>
+            <img src="{% static 'images/aguja-botonera.jpg' %}" alt="Aguja Botonera">
+            <p class="precio" id="precio6" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio6')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Correas de Overlock</h3>
+            <img src="{% static 'images/correas de overlock.jpg' %}" alt="Correas de Overlock">
+            <p class="precio" id="precio7" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio7')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Pie Prensa Telas</h3>
+            <img src="{% static 'images/pie-prensa-telas.jpg' %}" alt="Pie Prensa Telas">
+            <p class="precio" id="precio8" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio8')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Corta Hilacha</h3>
+            <img src="{% static 'images/corta hilacha.jpg' %}" alt="Corta Hilacha">
+            <p class="precio" id="precio9" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio9')">Añadir al Carrito</button>
+        </div>
+        <div class="producto">
+            <h3>Tijeras</h3>
+            <img src="{% static 'images/Tijeras.jpg' %}" alt="Tijeras">
+            <p class="precio" id="precio10" data-precio="2300" >Precio: $2.300</p>
+            <button onclick="agregarAlCarrito(2300, 'precio10')">Añadir al Carrito</button>
+        </div>
+    </div>
+
+    <h3>Total del Carrito: $<span id="total-carrito">0</span></h3>
+    <a href="{% url 'checkout' %}">Ir al Checkout</a>  -
+</section>
+
+
+
+{% endblock %}
+
+

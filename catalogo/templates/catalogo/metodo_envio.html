@@ -1,0 +1,9 @@
+<form method="POST" action="{% url 'procesar_envio' %}">
+    {% csrf_token %}
+    <label for="envio">Selecciona tu método de envío:</label>
+    <select name="envio" id="envio">
+        <option value="standard">Envío Estándar</option>
+        <option value="express">Envío Exprés</option>
+    </select>
+    <button type="submit">Continuar</button>
+</form>

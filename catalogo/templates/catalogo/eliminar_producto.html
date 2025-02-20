@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Eliminar Producto{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Caja central con bordes redondeados y sombra -->
+    <div class="card shadow-sm">
+        <div class="card-body text-center">
+            <!-- Icono de advertencia para llamar la atención -->
+            <h1 class="display-4 text-danger"><i class="fas fa-exclamation-triangle"></i></h1>
+            <h2 class="card-title">¿Estás seguro que deseas eliminar este producto?</h2>
+            <p class="card-text">No podrás deshacer esta acción</p>
+            <!-- Mostrando el nombre del producto -->
+            <p class="lead font-weight-bold">{{ producto.nombre }}</p>
+            
+            <!-- Formulario para eliminar el producto -->
+            <form method="post">
+                {% csrf_token %}
+                <!-- Botones de acción: Eliminar y Cancelar -->
+                <button type="submit" class="btn btn-danger btn-lg">Eliminar</button>
+                <a href="{% url 'listar_productos' %}" class="btn btn-secondary btn-lg ml-3">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

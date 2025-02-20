@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Política de Envío - La Casa de Hilos y Repuestos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Política de Envío</h1>
+    <div class="alert alert-info" role="alert">
+        <h4 class="alert-heading">Información Importante:</h4>
+        <p>
+            En La Casa de Hilos y Repuestos, ofrecemos envío gratuito para compras superiores a 50,000 pesos.
+        </p>
+        <p>
+            El envío se realiza dentro de un radio de 20 kilómetros desde nuestra tienda utilizando moto, Didi o Uber.
+        </p>
+        <p>
+            Para distancias mayores a 50 kilómetros, el envío será realizado por agencia y el costo correrá por cuenta del comprador.
+        </p>
+        <p>
+            Los productos serán entregados en un plazo máximo de 8 horas después de la compra si la distancia es dentro del radio de 20 km.
+        </p>
+        <hr>
+        <p class="mb-0">
+            Si tienes alguna pregunta, no dudes en <a href="{% url 'contacto' %}">contactarnos</a>.
+        </p>
+    </div>
+
+    <!-- Formulario para selección de envío -->
+    <form method="POST" action="{% url 'procesar_envio' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="distancia" class="form-label">Ingresa la distancia en kilómetros:</label>
+            <input type="number" name="distancia" id="distancia" class="form-control" required placeholder="Ej. 10">
+        </div>
+        <div class="mb-3">
+            <label for="envio" class="form-label">Selecciona tu método de envío:</label>
+            <select name="envio" id="envio" class="form-select" required>
+                <option value="moto">Envío en Moto o con Didi/Uber (hasta 20 km)</option>
+                <option value="agencia">Envío por Agencia (más de 50 km)</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="costo_envio" class="form-label">Costo de Envío:</label>
+            <input type="text" name="costo_envio" id="costo_envio" class="form-control" disabled>
+        </div>
+        <button type="submit" class="btn btn-primary">Continuar</button>
+    </form>
+
+    <!-- Enlace para regresar al checkout -->
+    <div class="text-center mt-4">
+        <a href="{% url 'checkout' %}" class="btn btn-secondary">Volver al Checkout</a>
+    </div>
+</div>
+
+<script>
+    // Script para calcular el costo de envío según la distancia
+    document.getElementById("distancia").addEventListener("input", function() {
+        const distancia = parseFloat(this.value);
+        const costoEnvioField = document.getElementById("costo_envio");
+
+        if (distancia <= 20) {
+            costoEnvioField.value = "Envío gratuito o costo dependiendo del servicio seleccionado (Didi, Uber, Moto)";
+        } else if (distancia > 20 && distancia <= 50) {
+            costoEnvioField.value = "Costo estimado: 50 soles (por Uber/Didi/Moto)";
+        } else {
+            costoEnvioField.value = "Costo de envío por agencia: A consultar según distancia";
+        }
+    });
+</script>
+{% endblock %}

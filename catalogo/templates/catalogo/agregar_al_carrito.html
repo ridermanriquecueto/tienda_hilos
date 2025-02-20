@@ -1,0 +1,19 @@
+<!-- agregar_al_carrito.html (o en tu plantilla de catálogo) -->
+<div class="producto">
+    <h2>{{ producto.nombre }}</h2>
+    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" />
+    <p>Precio: ${{ producto.precio }}</p>
+    <form action="{% url 'agregar_al_carrito' producto.id %}" method="post">
+        {% csrf_token %}
+        <input type="number" name="cantidad" value="1" min="1" max="{{ producto.stock }}">
+        <button type="submit">Agregar al Carrito</button>
+    </form>
+    
+    
+    <a href="{% url 'detalle_producto' producto.id %}">Ver Detalles</a>
+     
+    <!-- Botón Volver al Catálogo -->
+    <div class="mt-3">
+        <a href="{% url 'catalogo' %}" class="btn btn-primary">Volver al Catálogo</a>
+    </div>
+</div>

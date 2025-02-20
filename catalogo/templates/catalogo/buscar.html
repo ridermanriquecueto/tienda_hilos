@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Resultados de la búsqueda{% endblock %}
+
+{% block content %}
+<h2>Resultados de la búsqueda para "{{ query }}"</h2>
+
+{% if resultados %}
+    <ul>
+        {% for producto in resultados %}
+            <li>
+                <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a> - {{ producto.precio }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No se encontraron productos que coincidan con "{{ query }}".</p>
+{% endif %}
+{% endblock %}

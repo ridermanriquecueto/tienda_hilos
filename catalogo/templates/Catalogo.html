@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Catálogo de Productos - La Casa de Hilos y Repuestos{% endblock %}
+
+{% block content %}
+<section id="catalogo">
+    <h1>Catálogo de Productos</h1>
+    <p>Explora nuestra variedad de hilos y accesorios para costura.</p>
+    
+    <!-- Filtros y búsqueda -->
+    <form method="GET" action="{% url 'catalogo_listar' %}">
+        <input type="text" name="search" placeholder="Buscar productos..." value="{{ request.GET.search }}">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+
+    <!-- Mostrar los productos filtrados o todos -->
+    <div class="productos">
+        {% for producto in productos %}
+        <div class="producto">
+            <h3>{{ producto.nombre }}</h3>
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+            <p class="precio">Precio: ${{ producto.precio }}</p>
+            <input type="number" id="cantidad{{ producto.id }}" value="1" min="1" style="width: 60px;">
+            <a href="{% url 'detalle_producto' producto.id %}">Ver Detalles</a>
+        </div>
+        {% empty %}
+        <p>No se encontraron productos.</p>
+        {% endfor %}
+    </div>
+
+    <!-- Paginación -->
+    <div class="paginacion">
+        {% if productos.has_previous %}
+        <a href="?page={{ productos.previous_page_number }}">&laquo; Anterior</a>
+        {% endif %}
+        <span>Página {{ productos.number }} de {{ productos.paginator.num_pages }}</span>
+        {% if productos.has_next %}
+        <a href="?page={{ productos.next_page_number }}">Siguiente &raquo;</a>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'checkout' %}">Ir al Checkout</a>  
+</section>
+{% endblock %}

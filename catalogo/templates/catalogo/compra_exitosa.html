@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Comprobante de Compra{% endblock %}
+
+{% block content %}
+    <h2>Comprobante de Compra</h2>
+
+    <h3>Detalles de la compra</h3>
+    <p><strong>Nombre:</strong> {{ nombre }}</p>
+    <p><strong>Total:</strong> ${{ total }}</p>
+
+    <h4>Productos:</h4>
+    <ul>
+        {% for producto in productos %}
+            <li>{{ producto.nombre }} - ${{ producto.precio }}</li>
+        {% endfor %}
+    </ul>
+
+    <h4>Método de Pago:</h4>
+    <p>{{ metodo_pago }}</p>
+
+    <h4>Alias de pago:</h4>
+    <p>{{ alias }}</p>
+
+    <!-- Opción para imprimir el comprobante -->
+    <button onclick="window.print();" class="btn btn-primary">Imprimir Comprobante</button>
+
+    <!-- Volver al checkout -->
+    <div class="mt-3">
+        <a href="{% url 'checkout' %}" class="btn btn-secondary">Volver al Checkout</a>
+    </div>
+{% endblock %}

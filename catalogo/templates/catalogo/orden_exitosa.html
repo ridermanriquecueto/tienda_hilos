@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Compra Exitosa{% endblock %}
+
+{% block content %}
+<div class="container text-center my-5">
+    <h2 class="text-success">¡Tu compra ha sido confirmada!</h2>
+    <p>Gracias por tu compra. Nos pondremos en contacto contigo para coordinar el envío.</p>
+    <a href="{% url 'inicio' %}" class="btn btn-primary">Volver al Inicio</a>
+</div>
+{% endblock %}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+</head>
+<body>
+    <h1>Tu Carrito de Compras</h1>
+    
+    {% if carrito %}
+        <ul>
+            {% for item in carrito.itemcarrito_set.all %}
+                <li>{{ item.producto.nombre }} - Cantidad: {{ item.cantidad }} - Precio: ${{ item.subtotal }}</li>
+            {% endfor %}
+        </ul>
+        <form method="post">
+            {% csrf_token %}
+            <input type="text" name="nombre" placeholder="Tu nombre" required>
+            <input type="email" name="email" placeholder="Tu email" required>
+            <input type="text" name="direccion" placeholder="Tu dirección" required>
+            <button type="submit">Finalizar Compra</button>
+        </form>
+    {% else %}
+        <p>No tienes productos en tu carrito.</p>
+    {% endif %}
+    
+</body>
+</html>

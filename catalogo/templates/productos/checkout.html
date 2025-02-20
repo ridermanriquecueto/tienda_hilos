@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout - La Casa de Hilos y Repuestos{% endblock %}
+
+{% block content %}
+<div class="container my-4 p-4 rounded shadow bg-light">
+    <h2 class="text-center mb-4">Resumen de tu compra</h2>
+    
+    <table class="table table-hover text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.cantidad }}</td>
+                    <td>${{ producto.precio }}</td>
+                    <td>${{ producto.total }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h3 class="text-end">Total: ${{ totalCarrito }}</h3>
+
+    <form method="POST" action="{% url 'confirmar_compra' %}" class="mt-4">
+        {% csrf_token %}
+
+        <!-- Información de contacto -->
+        <h4 class="mb-3">Datos del comprador</h4>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="nombre" class="form-label">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label for="direccion" class="form-label">Dirección:</label>
+                <input type="text" id="direccion" name="direccion" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label for="telefono" class="form-label">Teléfono:</label>
+                <input type="tel" id="telefono" name="telefono" class="form-control" required>
+            </div>
+        </div>
+
+        <!-- Método de pago -->
+        <h4 class="mt-4">Método de Pago</h4>
+        <select name="metodo_pago" id="metodo_pago" class="form-select" required>
+            <option value="">Selecciona...</option>
+            <option value="mercado_pago">Mercado Pago</option>
+            <option value="cuenta_dni">Cuenta DNI</option>
+            <option value="transferencia_bancaria">Transferencia Bancaria</option>
+            <option value="tarjeta_credito">Tarjeta de Crédito</option>
+        </select>
+
+        <!-- Campos dinámicos según método de pago -->
+        <div id="pago_detalles" class="mt-3"></div>
+
+        <!-- Método de Envío -->
+        <h4 class="mt-4">Método de Envío</h4>
+        <select name="metodo_envio" class="form-select" required>
+            <option value="domicilio">Domicilio</option>
+            <option value="recoger_tienda">Retirar en Tienda</option>
+            <option value="didi_moto">Envío con moto (Didi)</option>
+            <option value="uber_moto">Envío con moto (Uber)</option>
+            <option value="didi_auto">Envío con auto (Didi)</option>
+            <option value="uber_auto">Envío con auto (Uber)</option>
+            <option value="agencia">Envío por Agencia</option>
+        </select>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-success w-50">Realizar Compra</button>
+            <a href="{% url 'carrito' %}" class="btn btn-secondary w-50">Volver al Carrito</a>
+        </div>
+    </form>
+</div>
+<script >document.addEventListener("DOMContentLoaded", function () {
+    const metodoPagoSelect = document.getElementById("metodo_pago");
+    const detallesPagoDiv = document.getElementById("pago_detalles");
+
+    metodoPagoSelect.addEventListener("change", function () {
+        const metodo = metodoPagoSelect.value;
+        detallesPagoDiv.innerHTML = "";
+
+        if (metodo === "transferencia_bancaria") {
+            detallesPagoDiv.innerHTML = `
+                <label for="banco" class="form-label">Banco:</label>
+                <input type="text" id="banco" name="banco" class="form-control" required>
+                
+                <label for="num_cuenta" class="form-label">Número de Cuenta:</label>
+                <input type="text" id="num_cuenta" name="num_cuenta" class="form-control" required>
+            `;
+        } else if (metodo === "tarjeta_credito") {
+            detallesPagoDiv.innerHTML = `
+                <label for="num_tarjeta" class="form-label">Número de Tarjeta:</label>
+                <input type="text" id="num_tarjeta" name="num_tarjeta" class="form-control" required>
+                
+                <label for="cvv" class="form-label">CVV:</label>
+                <input type="text" id="cvv" name="cvv" class="form-control" required>
+                
+                <label for="fecha_exp" class="form-label">Fecha de Expiración:</label>
+                <input type="month" id="fecha_exp" name="fecha_exp" class="form-control" required>
+            `;
+        }
+    });
+});
+</script>
+
+<script src="{% static 'catalogo/js/script.js' %}"></script>
+
+
+{% endblock %}

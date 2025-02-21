@@ -1,51 +1,91 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 {% block title %}Lista de Productos{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4 text-center">Lista de Productos</h2>
-
-    <!-- Mensajes de éxito -->
-
-    <!-- Tabla de productos -->
-    <table class="table table-bordered table-hover table-striped">
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Precio</th>
-                <th scope="col">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ producto.nombre }}</td>
-                <td>${{ producto.precio|floatformat:2 }}</td>
-                <td>
-                    <div class="action-buttons">
-                        <a href="{% url 'agregar_producto' %}" class="btn btn-success btn-sm">Agregar</a>
-                        <a href="{% url 'actualizar_producto' producto.pk %}" class="btn btn-warning btn-sm">Actualizar</a>
-                        <a href="{% url 'eliminar_producto' producto.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</a>
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center">
-                    <div class="empty-message-container">
-                        <i class="fas fa-box-open empty-icon"></i>
-                        <h3 class="empty-title">No hay productos disponibles</h3>
-                        <p class="empty-text">Por favor, agrega nuevos productos para mostrarlos aquí.</p>
-                        <a href="{% url 'agregar_producto' %}" class="btn btn-primary">Agregar Producto</a>
-                    </div>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h2 class="mb-4">Lista de Productos</h2>
+    
+    <!-- Formulario para eliminar productos seleccionados -->
+    <form method="post" id="eliminar-form" action="{% url 'eliminar_productos' %}">
+        {% csrf_token %}
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th> <!-- Columna para el número de producto -->
+                    <th scope="col"><input type="checkbox" id="select-all"> Seleccionar</th> <!-- Checkbox para seleccionar todos -->
+                    <th scope="col">Imagen</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td> <!-- Número de fila -->
+                        <td><input type="checkbox" name="productos" value="{{ producto.id }}" class="select-product"></td>
+                        <td><img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" width="50"></td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.precio }}</td>
+                        <td>
+                            <!-- Botón de actualizar (editar producto) -->
+                            <a href="{% url 'actualizar_producto' producto.pk %}" class="btn btn-warning btn-sm">Actualizar</a>
+                            
+                            <!-- Botón de eliminación individual con confirmación -->
+                            <a href="{% url 'eliminar_producto' producto.pk %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que quieres eliminar este producto?');">Eliminar</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Botón para eliminar los productos seleccionados, inicialmente oculto -->
+        <button type="submit" class="btn btn-danger" id="eliminar-button" style="display:none;" onclick="return confirmarEliminacion();">Eliminar seleccionados</button>
+    </form>
 </div>
+
+<script type="text/javascript">
+    // Seleccionar todos los productos
+    document.getElementById('select-all').addEventListener('change', function(e) {
+        const checkboxes = document.querySelectorAll('.select-product');
+        checkboxes.forEach((checkbox) => {
+            checkbox.checked = e.target.checked;
+        });
+        mostrarBotonEliminar();  // Mostrar el botón si hay productos seleccionados
+    });
+
+    // Función para mostrar u ocultar el botón de eliminación
+    function mostrarBotonEliminar() {
+        const selectedCheckboxes = document.querySelectorAll('.select-product:checked').length;
+        const eliminarButton = document.getElementById('eliminar-button');
+        
+        // Si hay productos seleccionados, mostrar el botón de eliminar
+        if (selectedCheckboxes > 0) {
+            eliminarButton.style.display = "inline-block";
+        } else {
+            eliminarButton.style.display = "none";
+        }
+    }
+
+    // Función para confirmar la eliminación de productos seleccionados
+    function confirmarEliminacion() {
+        var confirmation = confirm("¿Estás seguro de que quieres eliminar los productos seleccionados?");
+        if (confirmation) {
+            // Si confirma, envía el formulario
+            return true;
+        } else {
+            // Si no confirma, no se envía el formulario
+            return false;
+        }
+    }
+
+    // Detectar cambios en los checkboxes de productos seleccionados
+    const checkboxes = document.querySelectorAll('.select-product');
+    checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener('change', mostrarBotonEliminar);
+    });
+</script>
 
 {% endblock %}

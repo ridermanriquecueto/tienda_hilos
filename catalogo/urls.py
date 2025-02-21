@@ -56,7 +56,10 @@ urlpatterns = [
     path('actualizar/<int:pk>/', views.actualizar_producto, name='actualizar_producto'),
 
     # Eliminar productos
-    path('eliminar/<int:pk>/', views.eliminar_producto, name='eliminar_producto'),
+    
+    path('eliminar/<int:pk>/', views.eliminar_productos, name='eliminar_producto'),
+    path('eliminar/', views.eliminar_productos, name='eliminar_productos'), 
+    
 
     # Confirmación de orden
     path('crear_orden/', views.crear_orden, name='crear_orden'),

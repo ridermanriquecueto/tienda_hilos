@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+
 {% block title %}Catálogo de Productos - La Casa de Hilos y Repuestos{% endblock %}
 
 {% block content %}
@@ -7,7 +8,7 @@
     <p>Explora nuestra variedad de hilos y accesorios para costura.</p>
     
     <!-- Filtros y búsqueda -->
-    <form method="GET" action="{% url 'catalogo_listar' %}">
+    <form method="GET" action="{% url 'catalogo' %}">
         <input type="text" name="search" placeholder="Buscar productos..." value="{{ request.GET.search }}">
         <button type="submit" class="btn btn-primary">Buscar</button>
     </form>

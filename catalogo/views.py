@@ -216,14 +216,19 @@ def actualizar_producto(request, pk):
     
     return render(request, 'catalogo/actualizar_producto.html', {'form': form})
     
-def eliminar_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
-    if request.method == 'POST':
-        producto.delete()
-        messages.success(request, f'El producto {producto.nombre} ha sido eliminado con éxito.')
-        return redirect('listar_productos')  # O la vista a la que quieras redirigir
-    return render(request, 'catalogo/eliminar_producto.html', {'producto': producto})
 
+
+def eliminar_productos(request):
+    if request.method == 'POST':
+        productos_a_eliminar = request.POST.getlist('productos')  # Obtener la lista de productos seleccionados
+        productos = Producto.objects.filter(id__in=productos_a_eliminar)
+        
+        for producto in productos:
+            producto.delete()  # Eliminar cada producto seleccionado
+        
+        messages.success(request, "Productos eliminados con éxito.")
+        return redirect('listar_productos')  # Redirigir al listado de productos después de eliminar
+    return redirect('listar_productos')  # Si no es POST, redirigir al listado
 
 def actualizar_item_carrito(request, item_id):
     item = get_object_or_404(ItemCarrito, pk=item_id)
@@ -401,6 +406,8 @@ def procesar_pago(request):
 
 def politicas_envio(request):
     return render(request, 'catalogo/politicas_envio.html')
+
+
 def agregar_al_carrito(request, producto_id):
     # Obtener el producto de la base de datos o devolver un error 404 si no existe
     producto = get_object_or_404(Producto, id=producto_id)
@@ -496,33 +503,19 @@ def ver_carrito(request):
     })
 
 
-def catalogo(request):
-    query = request.GET.get('search', '')  # Obtener la búsqueda del formulario
-    if query:
-        # Filtrar productos por el nombre que contiene el texto de búsqueda
-        productos = Producto.objects.filter(nombre__icontains=query)
-    else:
-        # Si no hay búsqueda, mostrar todos los productos
-        productos = Producto.objects.all()
 
-    # Configuración de paginación
-    paginator = Paginator(productos, 10)  # Mostrar 10 productos por página
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+def listar_productos(request):
+    productos = Producto.objects.all()
 
-    # Renderizar la plantilla con los productos filtrados o todos
-    return render(request, 'catalogo.html', {'productos': page_obj})
-# Vista para el catálogo de productos
+    # Si se recibe el POST con los IDs seleccionados para eliminar
+    if request.method == 'POST':
+        producto_ids = request.POST.getlist('productos')  # Obtener los IDs seleccionados
+        if producto_ids:
+            Producto.objects.filter(id__in=producto_ids).delete()  # Eliminar productos
 
+        return redirect('listar_productos')  # Redirigir después de eliminar
 
-def catalogo_listar(request):
-    search_query = request.GET.get('search', '')  # Obtén la búsqueda desde el formulario
-    if search_query:
-        productos = Producto.objects.filter(nombre__icontains=search_query)  # Filtrar por nombre
-    else:
-        productos = Producto.objects.all()  # Si no hay búsqueda, mostrar todos
-    return render(request, 'catalogo/catalogo_listar.html', {'productos': productos})
-
+    return render(request, 'productos/listar_productos.html', {'productos': productos})
 
 
 
@@ -573,9 +566,30 @@ def some_function():
     from .views import CarritoView  # Importación dentro de la función
     # Lógica que usa CarritoView
 
-def catalogo_view(request):
-    productos = Producto.objects.all()  # Ajusta según tus necesidades
-    return render(request, 'catalogo/catalogo.html', {'productos': productos})
+# Vista para el catálogo de productos
+
+
+def catalogo(request):
+    query = request.GET.get('search', '')  # Obtener la búsqueda del formulario
+    if query:
+        # Filtrar productos por el nombre que contiene el texto de búsqueda
+        productos = Producto.objects.filter(nombre__icontains=query)
+    else:
+        # Si no hay búsqueda, mostrar todos los productos
+        productos = Producto.objects.all()
+
+    # Configuración de paginación
+    paginator = Paginator(productos, 10)  # Mostrar 10 productos por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Renderizar la plantilla con los productos filtrados o todos
+    return render(request, 'catalogo.html', {'productos': page_obj})
+# Vista para el catálogo de productos
+
+def catalogo_listar(request):
+    productos = Producto.objects.all()
+    return render(request, 'catalogo/listar.html', {'productos': productos})
 
 def compra_exitosa(request):
     # Lógica para la vista de compra exitosa

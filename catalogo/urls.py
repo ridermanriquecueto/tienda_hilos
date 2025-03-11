@@ -3,6 +3,14 @@ from . import views
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from .views import confirmar_compra, orden_exitosa
+from .views import ver_carrito, agregar_al_carrito
+
+from .views import  eliminar_productos, listar_productos, crear_producto, editar_producto
+
+
+
+app_name = 'catalogo'
+
 
 
 urlpatterns = [
@@ -13,15 +21,24 @@ urlpatterns = [
 
     # Páginas principales
     path('', views.inicio, name='inicio'),
-    path('productos/', views.listar_productos, name='listar_productos'),
+    
+    
     path('contacto/', views.contacto, name='contacto'),
 
     # Carrito de compras
-    path('carrito/', views.carrito, name='carrito'),
+   
+    
+   
+   
+    
     path('carrito/', views.ver_carrito, name='ver_carrito'),
     path('carrito/finalizar/', views.finalizar_compra, name='finalizar_compra'),
     path('carrito/eliminar/<int:producto_id>/<int:eliminar_todo>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
-    path('agregar_al_carrito/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
+   
+    path('catalogo/agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
+   
+    path('agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
+
     path('actualizar_carrito/<int:producto_id>/', views.actualizar_carrito, name='actualizar_carrito'),
 
     # Confirmación de compra
@@ -31,7 +48,7 @@ urlpatterns = [
     # Catálogo
     path('catalogo/', views.catalogo, name='catalogo'),
     path('catalogo/listar/', views.catalogo_listar, name='catalogo_listar'), 
-    path('catalogo/agregar/<int:producto_id>/', views.agregar_al_carrito, name='agregar_al_carrito'),
+ 
 
     # Detalle de productos
     path('producto/<int:producto_id>/', views.detalle_producto, name='detalle_producto'),
@@ -50,15 +67,26 @@ urlpatterns = [
 
     # Carga masiva de productos
     path('carga-masiva/', views.carga_masiva, name='carga_masiva'),
+    path('productos/', views.listar_productos, name='listar_productos'),
 
     # Agregar y actualizar productos
     path('agregar/', views.agregar_producto, name='agregar_producto'),
     path('actualizar/<int:pk>/', views.actualizar_producto, name='actualizar_producto'),
+    
 
     # Eliminar productos
+    path('carrito/eliminar/<int:producto_id>/<int:eliminar_todo>/', views.eliminar_del_carrito, name='eliminar_del_carrito'),
+    # Para eliminar un solo producto
+path('eliminar/<int:pk>/', views.eliminar_producto, name='eliminar_producto'),
+   path('productos/editar/<int:id>/', views.editar_producto, name='editar_producto'),  # Para editar productos
+
+# Para eliminar varios productos
+path('eliminar/', views.eliminar_productos, name='eliminar_productos'),
     
-    path('eliminar/<int:pk>/', views.eliminar_productos, name='eliminar_producto'),
-    path('eliminar/', views.eliminar_productos, name='eliminar_productos'), 
+
+
+  
+
     
 
     # Confirmación de orden
@@ -75,4 +103,8 @@ urlpatterns = [
     path("checkout/confirmar/", confirmar_compra, name="confirmar_compra"),
   
     path("orden-exitosa/", orden_exitosa, name="orden_exitosa"),
+
+
+
+
 ]

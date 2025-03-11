@@ -39,14 +39,16 @@ class OrdenView(models.Model):
     def __str__(self):
         return f"OrdenView {self.id} - Total: ${self.total}"
 
-
-
 def inicio(request):
     productos = Producto.objects.all()
-    return render(request, 'catalogo/inicio.html')
+    carrito = request.session.get('carrito', [])  # Obtener el carrito de la sesión
+    return render(request, 'catalogo/inicio.html', {'productos': productos, 'carrito': carrito})
 
 def productos(request):
-    return render(request, 'catalogo/productos.html')
+    productos = Producto.objects.all()  # Obtener todos los productos de la base de datos
+    return render(request, 'catalogo/productos.html', {'productos': productos})
+
+
 
 def contacto(request):
     return render(request, 'catalogo/contacto.html')
@@ -118,11 +120,11 @@ def agregar_producto(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Producto agregado exitosamente.')
-            return redirect('listar_productos')
+            return redirect('catalogo:listar_productos')
     else:
         form = ProductoForm()
     
-    return render(request, 'productos/agregar_producto.html', {'form': form})
+    return render(request, 'catalogo/agregar_producto.html', {'form': form})
 
 
 class ActualizarProductoView(UpdateView):
@@ -131,17 +133,12 @@ class ActualizarProductoView(UpdateView):
     fields = ['nombre', 'precio', 'descripcion']
     success_url = '/productos/'
 
-
-
-def mi_vista(request):
+def listar_productos(request):
     productos = Producto.objects.all()
-    return render(request, 'mi_template.html', {'productos': productos})
+    return render(request, 'catalogo/productos.html', {'productos': productos})   
 
-class EliminarProductoView(View):
-    def get(self, request, pk):
-        producto = get_object_or_404(Producto, pk=pk)
-        producto.delete()
-        return redirect('listar_productos')  # Redirige después de eliminar
+
+
     
 
 def carga_masiva(request):
@@ -150,7 +147,7 @@ def carga_masiva(request):
 
         if not csv_file or not csv_file.name.endswith('.csv'):
             messages.error(request, 'Por favor, sube un archivo CSV válido.')
-            return redirect('productos:carga_masiva')  # Asegúrate de que la URL de carga masiva esté definida
+            return redirect('catalogo:carga_masiva')  # Asegúrate de que la URL de carga masiva esté definida
 
         try:
             # Leer el archivo CSV
@@ -160,7 +157,7 @@ def carga_masiva(request):
                 # Validar que los campos necesarios existen
                 if not all(field in row for field in ['nombre', 'descripcion', 'precio', 'stock']):
                     messages.error(request, 'El archivo CSV está incompleto.')
-                    return redirect('productos:carga_masiva')
+                    return redirect('catalogo:carga_masiva')
 
                 # Intentar convertir precio y stock a tipos adecuados
                 try:
@@ -168,7 +165,7 @@ def carga_masiva(request):
                     stock = int(row['stock'])
                 except ValueError:
                     messages.error(request, 'El precio o el stock tienen un formato incorrecto.')
-                    return redirect('productos:carga_masiva')
+                    return redirect('catalogo:carga_masiva')
 
                 # Crear el producto
                 Producto.objects.create(
@@ -192,16 +189,28 @@ def carga_masiva(request):
 
 
 # Vista para mostrar los detalles de un producto
-
 def detalle_producto(request, producto_id):
+    # Obtener el producto
     producto = get_object_or_404(Producto, id=producto_id)
-    return render(request, 'catalogo/detalle_producto.html', {'producto': producto})
+    
+    # Convertir el precio a float para evitar problemas con JSON
+    precio = float(producto.precio)
+    
+    return render(request, 'catalogo/detalle_producto.html', {'producto': producto, 'precio': precio})
 
 
+def editar_producto(request, id):
+    producto = get_object_or_404(Producto, id=id)
+    if request.method == 'POST':
+        form = ProductoForm(request.POST, instance=producto)
+        if form.is_valid():
+            form.save()
+            return redirect('catalogo:listar_productos')
+    else:
+        form = ProductoForm(instance=producto)
+    return render(request, 'catalogo/editar_producto.html', {'form': form, 'producto': producto})
 
-def listar_productos(request):
-    productos = Producto.objects.all()
-    return render(request, 'productos/listar_productos.html', {'productos': productos})
+
 
 def actualizar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
@@ -217,18 +226,30 @@ def actualizar_producto(request, pk):
     return render(request, 'catalogo/actualizar_producto.html', {'form': form})
     
 
-
 def eliminar_productos(request):
     if request.method == 'POST':
-        productos_a_eliminar = request.POST.getlist('productos')  # Obtener la lista de productos seleccionados
-        productos = Producto.objects.filter(id__in=productos_a_eliminar)
-        
-        for producto in productos:
-            producto.delete()  # Eliminar cada producto seleccionado
-        
-        messages.success(request, "Productos eliminados con éxito.")
-        return redirect('listar_productos')  # Redirigir al listado de productos después de eliminar
-    return redirect('listar_productos')  # Si no es POST, redirigir al listado
+        productos_ids = request.POST.getlist('productos')  # Obtener lista de IDs de productos seleccionados
+        if productos_ids:  # Verificar si hay productos seleccionados
+            Producto.objects.filter(id__in=productos_ids).delete()  # Eliminar los productos seleccionados
+        return redirect('catalogo:listar_productos')  # Redirigir después de la eliminación
+    return redirect('catalogo:listar_productos')  # Redirigir si no es una petición POST
+
+#elimina del crud#
+
+def eliminar_producto(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    if request.method == 'POST':
+        producto.delete()
+        return redirect('catalogo:listar_productos')  # Redirigir a la lista de productos
+    return render(request, 'catalogo/eliminar_producto.html', {'producto': producto})
+
+
+
+ 
+
+
+
+
 
 def actualizar_item_carrito(request, item_id):
     item = get_object_or_404(ItemCarrito, pk=item_id)
@@ -298,45 +319,9 @@ def buscar(request):
 
 
 
-def actualizar_carrito(request, producto_id):
-    carrito = request.session.get('carrito', {})
-    if str(producto_id) in carrito:
-        cantidad = int(request.POST.get('cantidad', 1))  # Obtiene la cantidad del formulario
-        if cantidad > 0:
-            carrito[str(producto_id)]['cantidad'] = cantidad  # Actualiza la cantidad
-        else:
-            del carrito[str(producto_id)]  # Elimina el producto si la cantidad es 0
-
-    request.session['carrito'] = carrito
-    return redirect('ver_carrito')  # Redirige a la vista del carrito
 
 
-def eliminar_del_carrito(request, producto_id, eliminar_todo=0):
-    # Convertir eliminar_todo de entero a booleano
-    eliminar_todo = bool(int(eliminar_todo))  # Convertimos el valor a entero y luego a booleano
 
-    # Obtener el carrito del usuario
-    carrito = Carrito.objects.get(usuario=request.user)  # Aquí cambiamos user por usuario
-
-    # Verificar si el producto existe en el carrito
-    if producto_id in carrito.productos:
-        if eliminar_todo:
-            # Eliminar el producto completo del carrito
-            carrito.productos.remove(producto_id)
-        else:
-            # Reducir la cantidad en 1 si hay más de 1 producto
-            producto = carrito.productos.get(id=producto_id)
-            if producto.cantidad > 1:
-                producto.cantidad -= 1
-            else:
-                # Si la cantidad es 1, eliminar el producto del carrito
-                carrito.productos.remove(producto)
-
-        # Guardar el carrito actualizado
-        carrito.save()
-
-    # Redirigir al carrito para mostrar los cambios
-    return redirect('ver_carrito')
 
 def procesar_carrito(request, nombre, direccion, telefono, metodo_pago, metodo_envio):
     carrito = obtener_carrito(request.session)
@@ -407,115 +392,160 @@ def procesar_pago(request):
 def politicas_envio(request):
     return render(request, 'catalogo/politicas_envio.html')
 
-
 def agregar_al_carrito(request, producto_id):
-    # Obtener el producto de la base de datos o devolver un error 404 si no existe
+    # Obtener el producto o devolver un error 404 si no existe
     producto = get_object_or_404(Producto, id=producto_id)
-
-    # Asegurarse de que el precio del producto no sea nulo
-    if producto.precio is None:
-        print(f"Producto {producto_id} no tiene precio asignado!")
-        return redirect('ver_carrito')
+    
+    # Convertir el precio a float de manera segura
+    precio = float(producto.precio) if producto.precio else 0.0
 
     # Obtener el carrito de la sesión, si no existe, crear uno vacío
     carrito = request.session.get('carrito', {})
 
-    # Obtener la cantidad seleccionada desde el formulario (valor por defecto 1) y validación
+    # Obtener la cantidad seleccionada desde el formulario (valor por defecto 1)
     cantidad = request.POST.get('cantidad', 1)
     try:
         cantidad = max(1, int(cantidad))  # Asegura que la cantidad sea al menos 1
-    except ValueError:
-        cantidad = 1  # Si no es un número válido, asignamos 1 como valor predeterminado
+    except (ValueError, TypeError):
+        cantidad = 1  # Si no es un número válido, asignamos 1
 
-    # Calcular el subtotal (producto.precio debería ser un valor numérico)
-    precio = producto.precio if producto.precio is not None else 0.0
-    print(f"Producto {producto_id} - Precio: {precio} - Cantidad: {cantidad} - Subtotal: {precio * cantidad}")
+    # Asegurar que la cantidad no exceda el stock disponible
+    producto_id_str = str(producto_id)  # Convertimos el ID a string para consistencia
+    cantidad_disponible = producto.stock
 
-    subtotal = precio * cantidad
-
-    # Agregar o actualizar el producto en el carrito
-    producto_id_str = str(producto_id)
     if producto_id_str in carrito:
-        # Si el producto ya está en el carrito, actualizar la cantidad y el subtotal
-        carrito[producto_id_str]['cantidad'] += cantidad
-        carrito[producto_id_str]['subtotal'] = carrito[producto_id_str]['precio'] * carrito[producto_id_str]['cantidad']
+        cantidad_total = carrito[producto_id_str]['cantidad'] + cantidad
+        if cantidad_total > cantidad_disponible:
+            cantidad = cantidad_disponible - carrito[producto_id_str]['cantidad']  # Ajustar cantidad disponible
     else:
-        # Si el producto no está en el carrito, agregarlo
-        carrito[producto_id_str] = {
-            'nombre': producto.nombre,
-            'precio': precio,  # Asegurarse de que el precio sea un número flotante
-            'cantidad': cantidad,
-            'subtotal': subtotal
-        }
+        if cantidad > cantidad_disponible:
+            cantidad = cantidad_disponible  # Ajustar cantidad disponible si es un nuevo producto en el carrito
+
+    # Si la cantidad es mayor a 0, agregar o actualizar el producto en el carrito
+    if cantidad > 0:
+        if producto_id_str in carrito:
+            carrito[producto_id_str]['cantidad'] += cantidad
+        else:
+            carrito[producto_id_str] = {
+                'nombre': producto.nombre,
+                'precio': float(precio),  # Asegúrate de que 'precio' sea float en este paso
+                'cantidad': cantidad,
+            }
+        carrito[producto_id_str]['subtotal'] = float(carrito[producto_id_str]['precio']) * carrito[producto_id_str]['cantidad']  # Convertir a float el subtotal
 
     # Guardar el carrito actualizado en la sesión
     request.session['carrito'] = carrito
+    request.session.modified = True  # Forzar a Django a detectar cambios en la sesión
 
-    # Redirigir al carrito
-    return redirect('ver_carrito')  # Asegúrate de que 'ver_carrito' esté en tus URLs
+    return redirect('catalogo:ver_carrito') 
 
 def ver_carrito(request):
     carrito = request.session.get('carrito', {})
     items = []
     total = 0
-    total_productos = 0  # Variable para contar el número total de productos
+    total_productos = 0
+    mensajes_stock = []  # Lista para mensajes de ajuste de stock
+    carrito_actualizado = {}
 
-    # Hacemos una copia del carrito para evitar modificar el diccionario mientras se itera
-    carrito_copy = carrito.copy()
-
-    for producto_id, datos in carrito_copy.items():
+    for producto_id, datos in carrito.items():
         try:
             producto = Producto.objects.get(id=producto_id)
         except Producto.DoesNotExist:
-            # Si el producto no existe, eliminarlo del carrito original
-            del carrito[producto_id]
-            continue  # Saltar a la siguiente iteración
+            continue  # Si el producto no existe, lo ignoramos
 
-        # Verificar que la cantidad en el carrito no exceda el stock disponible
-        if datos['cantidad'] > producto.stock:
-            # Si la cantidad solicitada excede el stock, ajustamos la cantidad en el carrito
-            datos['cantidad'] = producto.stock
-            carrito[producto_id]['cantidad'] = producto.stock  # Actualizamos el carrito en la sesión
-            # Informar al usuario de la corrección
-            mensaje = f"La cantidad del producto '{producto.nombre}' ha sido ajustada al stock disponible ({producto.stock})."
-            request.session['mensaje_stock'] = mensaje
-        
-        subtotal = datos['cantidad'] * producto.precio
+        # Si el producto está agotado, lo eliminamos del carrito
+        if producto.stock == 0:
+            continue  
+
+        cantidad = min(datos['cantidad'], producto.stock)  # Ajustar al stock disponible
+
+        if cantidad < datos['cantidad']:
+            mensajes_stock.append(f"La cantidad del producto '{producto.nombre}' ha sido ajustada al stock disponible ({producto.stock}).")
+
+        # Convertir el precio a float para evitar problemas de serialización
+        precio_producto = float(producto.precio) if producto.precio else 0.0
+        subtotal = cantidad * precio_producto
+
         items.append({
             'producto': producto,
-            'cantidad': datos['cantidad'],
+            'cantidad': cantidad,
             'subtotal': subtotal,
         })
+
         total += subtotal
-        total_productos += datos['cantidad']  # Sumar la cantidad de cada producto al total
+        total_productos += cantidad
 
-    # Guardar el carrito actualizado en la sesión
-    request.session['carrito'] = carrito
+        # Ahora, ya aseguramos que precio_producto es un float en lugar de convertirlo en la asignación
+        carrito_actualizado[producto_id] = {
+            'nombre': producto.nombre,
+            'precio': precio_producto,  # Ya es un float, por lo que no es necesario otro cast aquí
+            'cantidad': cantidad,
+        }
 
-    # Obtener el mensaje de stock si existe
-    mensaje_stock = request.session.pop('mensaje_stock', None)
+    # Guardamos el carrito actualizado en la sesión solo si hubo cambios
+    if carrito_actualizado != carrito:
+        request.session['carrito'] = carrito_actualizado
 
     return render(request, 'catalogo/carrito.html', {
         'items': items,
         'total': total,
         'total_productos': total_productos,
-        'mensaje_stock': mensaje_stock  # Para mostrar el mensaje al usuario si hubo un ajuste
+        'mensaje_stock': "\n".join(mensajes_stock) if mensajes_stock else None  # Convertir la lista en un string
     })
+def actualizar_carrito(request, producto_id):
+    # Obtener el carrito de la sesión
+    carrito = request.session.get('carrito', {})
 
+    # Verificar si el producto está en el carrito
+    if str(producto_id) in carrito:
+        # Obtener la cantidad del formulario
+        cantidad = int(request.POST.get('cantidad', 1))
+        
+        # Si la cantidad es mayor que 0, actualizarla
+        if cantidad > 0:
+            carrito[str(producto_id)]['cantidad'] = cantidad  # Actualizar cantidad
+        else:
+            # Si la cantidad es 0 o menor, eliminar el producto del carrito
+            del carrito[str(producto_id)]
 
+    # Guardar el carrito actualizado en la sesión
+    request.session['carrito'] = carrito
+    request.session.modified = True  # Asegurarse de que la sesión se actualice
 
-def listar_productos(request):
-    productos = Producto.objects.all()
+    # Redirigir a la vista de ver_carrito
+    return redirect('catalogo:ver_carrito') 
+def eliminar_del_carrito(request, producto_id, eliminar_todo):
+    # Obtener el carrito de la sesión
+    carrito = request.session.get('carrito', {})
 
-    # Si se recibe el POST con los IDs seleccionados para eliminar
+    # Verificar si el producto está en el carrito
+    if str(producto_id) in carrito:
+        # Acceder a la cantidad actual del producto
+        cantidad = carrito[str(producto_id)].get('cantidad', 0)
+
+        # Si la cantidad es mayor que 1, disminuirla en 1
+        if cantidad > 1:
+            carrito[str(producto_id)]['cantidad'] -= 1
+        else:
+            # Si la cantidad es 1 o menos, eliminar el producto del carrito
+            del carrito[str(producto_id)]
+
+        # Guardar el carrito actualizado en la sesión
+        request.session['carrito'] = carrito
+
+    # Redirigir a la vista correcta, en este caso al carrito
+    return redirect('catalogo:ver_carrito')  # Asegúrate de que 'ver_carrito' esté en tu archivo de URLs
+
+def some_view(request):
+    return redirect(reverse('catalogo:ver_carrito'))
+
+def eliminar_producto(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'POST':
-        producto_ids = request.POST.getlist('productos')  # Obtener los IDs seleccionados
-        if producto_ids:
-            Producto.objects.filter(id__in=producto_ids).delete()  # Eliminar productos
+        producto.delete()
+        return redirect('catalogo:listar_productos')  # Asegúrate de que la vista listar_productos esté definida
+    return render(request, 'catalogo/eliminar_producto.html', {'producto': producto})
 
-        return redirect('listar_productos')  # Redirigir después de eliminar
-
-    return render(request, 'productos/listar_productos.html', {'productos': productos})
 
 
 

@@ -19,7 +19,7 @@
     </div>
 
     <!-- Formulario de contacto -->
-    <form method="POST" action="{% url 'procesar_contacto' %}" class="bg-light p-4 shadow rounded w-75 mx-auto" autocomplete="off">
+    <form method="POST" action="{% url 'catalogo:procesar_contacto' %}" class="bg-light p-4 shadow rounded w-75 mx-auto" autocomplete="off">
         {% csrf_token %}
         
         <!-- Campo Nombre -->

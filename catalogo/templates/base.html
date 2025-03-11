@@ -31,7 +31,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'inicio' %}">Inicio</a>
+            <a class="navbar-brand" href="{% url 'catalogo:inicio' %}">Inicio</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -43,25 +43,26 @@
                             Productos
                         </a>
                         <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{% url 'listar_productos' %}">Listar Productos</a></li>
-                            <li><a class="dropdown-item" href="{% url 'agregar_producto' %}">Agregar Producto</a></li>
-                            <li><a class="dropdown-item" href="{% url 'carga_masiva' %}">Carga Masiva</a></li>
+                           
+                            <li><a class="dropdown-item" href="{% url 'catalogo:agregar_producto' %}">Agregar Producto</a></li>
+                            <li><a class="dropdown-item" href="{% url 'catalogo:listar_productos' %}">Listar Productos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'catalogo:carga_masiva' %}">Carga Masiva</a></li>
                         </ul>
                     </li>
                     <!-- Resto de los elementos del menú -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'contacto' %}">Contacto</a>
+                        <a class="nav-link" href="{% url 'catalogo:contacto' %}">Contacto</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'catalogo' %}">Catálogo</a>
+                        <a class="nav-link" href="{% url 'catalogo:catalogo' %}">Catálogo</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'ver_carrito' %}">
+                        <a class="nav-link" href="{% url 'catalogo:ver_carrito' %}">
                             Carrito ({{ carrito|length }})
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'checkout' %}">Checkout</a>
+                        <a class="nav-link" href="{% url 'catalogo:checkout' %}">Checkout</a>
                     </li>
                 </ul>
             </div>

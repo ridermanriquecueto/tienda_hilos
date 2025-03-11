@@ -1,6 +1,5 @@
 <!-- templates/catalogo/detalle_producto.html -->
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}{{ producto.nombre }} - La Casa de Hilos y Repuestos{% endblock %}
 
@@ -25,7 +24,7 @@
     {% endif %}
 
     <!-- Formulario para agregar al carrito -->
-    <form action="{% url 'agregar_al_carrito' producto_id=producto.id %}" method="POST" class="formulario-agregar">
+    <form action="{% url 'catalogo:agregar_al_carrito' producto_id=producto.id %}" method="POST" class="formulario-agregar">
         {% csrf_token %}
         <div class="form-group">
             <label for="cantidad">Cantidad:</label>
@@ -35,8 +34,8 @@
     </form>
 
     <nav class="navegacion">
-        <a href="{% url 'catalogo' %}" class="btn-navegacion">Volver al Catálogo</a>
-        <a href="{% url 'checkout' %}" class="btn-navegacion">Finalizar Compra</a>
+        <a href="{% url 'catalogo:catalogo' %}" class="btn-navegacion">Volver al Catálogo</a>
+        <a href="{% url 'catalogo:checkout' %}" class="btn-navegacion">Finalizar Compra</a>
     </nav>
 </main>
 {% endblock %}

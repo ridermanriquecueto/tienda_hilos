@@ -30,7 +30,7 @@
 
     <h3 class="text-end">Total: ${{ totalCarrito }}</h3>
 
-    <form method="POST" action="{% url 'confirmar_compra' %}" class="mt-4">
+    <form method="POST" action="{% url 'catalogo:confirmar_compra' %}" class="mt-4">
         {% csrf_token %}
 
         <!-- Información de contacto -->
@@ -78,7 +78,7 @@
         <!-- Botones -->
         <div class="d-flex justify-content-center gap-3 mt-4">
             <button type="submit" class="btn btn-success w-50">Realizar Compra</button>
-            <a href="{% url 'carrito' %}" class="btn btn-secondary w-50">Volver al Carrito</a>
+            <a href="{% url 'catalogo:ver_carrito' %}" class="btn btn-secondary w-50">Volver al Carrito</a>
         </div>
     </form>
 </div>

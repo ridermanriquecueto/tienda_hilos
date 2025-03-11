@@ -6,7 +6,7 @@
 
 <div class="container mt-5">
     <h2 class="mb-4">Agregar Nuevo Producto</h2>
-    <form method="post" action="{% url 'agregar_producto' %}" enctype="multipart/form-data" autocomplete="off">
+    <form method="post" action="{% url 'catalogo:agregar_producto' %}" enctype="multipart/form-data" autocomplete="off">
         {% csrf_token %}
         
         <div class="form-group">

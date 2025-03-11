@@ -14,7 +14,7 @@
             <a href="https://wa.me/542216769436" target="_blank" class="whatsapp-icon">
                 <img src="{% static 'images/whatsapp-64.webp' %}" alt="WhatsApp">
             </a>
-            <a href="{% url 'carrito' %}" class="cart-icon">
+            <a href="{% url 'catalogo:ver_carrito' %}" class="cart-icon">
                 <img src="{% static 'images/carro.jpg' %}" alt="Carrito de Compras">
             </a>
             <div class="map-icon">
@@ -26,7 +26,7 @@
     </div>
 
     <p>
-        <a href="{% url 'catalogo' %}">Ver Catálogo</a>  <!-- Debe coincidir con el nombre en urls.py -->
+        <a href="{% url 'catalogo:catalogo' %}">Ver Catálogo</a>  <!-- Debe coincidir con el nombre en urls.py -->
 
     </p>
 </section>

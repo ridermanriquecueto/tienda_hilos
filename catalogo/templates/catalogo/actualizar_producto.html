@@ -16,9 +16,44 @@
 
     <div class="container mt-5">
         <h1 class="text-center">Actualizar Producto</h1>
-        <form method="post" class="mx-auto" style="max-width: 400px;">
+        <form method="post" class="mx-auto" style="max-width: 600px;" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
+            <div class="mb-3">
+                {{ form.nombre.label_tag }}
+                {{ form.nombre }}
+                {{ form.nombre.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.precio.label_tag }}
+                {{ form.precio }}
+                {{ form.precio.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.stock.label_tag }}
+                {{ form.stock }}
+                {{ form.stock.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.descripcion.label_tag }}
+                {{ form.descripcion }}
+                {{ form.descripcion.errors }}
+            </div>
+            <div class="mb-3">
+                {{ form.imagen.label_tag }}
+                {{ form.imagen }}
+                {{ form.imagen.errors }}
+            </div>
+
+            <div class="form-check form-switch mb-3">
+                {{ form.destacado }}
+                <label class="form-check-label" for="id_destacado">Destacado</label>
+            </div>
+
+            <div class="form-check form-switch mb-3">
+                {{ form.oferta }}
+                <label class="form-check-label" for="id_oferta">En oferta</label>
+            </div>
+
             <button type="submit" class="btn btn-primary btn-block">Actualizar</button>
             <a href="{% url 'catalogo:listar_productos' %}" class="btn btn-secondary btn-block">Cancelar</a>
         </form>

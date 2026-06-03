@@ -17,16 +17,30 @@
 
 <header>
     <div class="top-bar">
-        <img src="{% static 'images/log.png' %}" alt="Hilos & Repuestos de Confección" class="logo">
-        <p>Hilos & Repuestos de Confección</p>
-        <form action="#" method="get" class="search-form">
-            <input type="text" name="search" placeholder="Buscar productos...">
-            <button type="submit">Buscar</button>
-        </form>
-        <a class="contact-info header-contact-info" href="tel:+542216769436">
-            <i class="fas fa-mobile-alt"></i>
-            <span class="elementor-icon-list-text">+54 2216769436</span>
-        </a>
+        <div class="container d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <img src="{% static 'images/log.png' %}" alt="Hilos & Repuestos de Confección" class="logo">
+                <p class="mb-0 ms-2">Hilos & Repuestos de Confección</p>
+            </div>
+            <div class="top-icons d-flex align-items-center gap-3">
+                <a href="{% url 'catalogo:ver_carrito' %}" class="text-dark" title="Ver carrito">
+                    <i class="fas fa-shopping-cart fa-lg"></i>
+                </a>
+                <a href="https://wa.me/542216769436" target="_blank" class="text-success" title="WhatsApp">
+                    <i class="fab fa-whatsapp fa-lg"></i>
+                </a>
+                <a href="{% url 'catalogo:contacto' %}" class="text-dark" title="Cómo llegar">Cómo llegar</a>
+                <a class="contact-info header-contact-info" href="tel:+542216769436">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span class="elementor-icon-list-text">+54 2216769436</span>
+                </a>
+                {% if user.is_staff %}
+                <a href="{% url 'admin:index' %}" class="text-white ms-2" title="Admin: {{ user.get_full_name|default:user.username }}">
+                    <i class="fas fa-user-shield fa-lg" aria-hidden="true"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -37,19 +51,23 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <!-- Menú desplegable de Productos -->
+                    
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             Productos
                         </a>
                         <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="navbarDropdown">
                            
+                            {% if user.is_staff %}
                             <li><a class="dropdown-item" href="{% url 'catalogo:agregar_producto' %}">Agregar Producto</a></li>
+                            {% endif %}
                             <li><a class="dropdown-item" href="{% url 'catalogo:listar_productos' %}">Listar Productos</a></li>
+                            {% if user.is_staff %}
                             <li><a class="dropdown-item" href="{% url 'catalogo:carga_masiva' %}">Carga Masiva</a></li>
+                            {% endif %}
                         </ul>
                     </li>
-                    <!-- Resto de los elementos del menú -->
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'catalogo:contacto' %}">Contacto</a>
                     </li>
@@ -58,8 +76,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'catalogo:ver_carrito' %}">
-                            Carrito ({{ carrito|length }})
+                            Carrito ({{ request.session.carrito|default_if_none:''|length }})
                         </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if not user.is_staff %}text-muted{% endif %}" href="{% url 'admin:index' %}" {% if not user.is_staff %}title="Acceso sólo para staff"{% endif %}>Admin</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'catalogo:checkout' %}">Checkout</a>
@@ -71,7 +92,7 @@
 </header>
 
 <main>
-    <!-- Mensajes de alerta -->
+    
     {% if messages %}
         <div class="container mt-3">
             {% for message in messages %}
@@ -130,7 +151,7 @@
     </div>
 </footer>
 
-<!-- Scripts -->
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="{% static 'catalogo/js/script.js' %}"></script>

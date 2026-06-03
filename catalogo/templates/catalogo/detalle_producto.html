@@ -1,12 +1,13 @@
-<!-- templates/catalogo/detalle_producto.html -->
+
 {% extends 'base.html' %}
+{% load product_image_tags %}
 
 {% block title %}{{ producto.nombre }} - La Casa de Hilos y Repuestos{% endblock %}
 
 {% block content %}
 <main class="detalle-producto">
     <h1>{{ producto.nombre }}</h1>
-    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="producto-imagen" />
+    <img src="{{ producto|product_image }}" alt="{{ producto.nombre }}" class="producto-imagen" />
     
     <div class="informacion-producto">
         <p><strong>Descripción:</strong> {{ producto.descripcion }}</p>
@@ -14,7 +15,7 @@
         <p><strong>Stock disponible:</strong> {{ producto.stock }}</p>
     </div>
 
-    <!-- Mostrar mensajes de confirmación -->
+    
     {% if messages %}
         <ul class="mensajes">
             {% for message in messages %}
@@ -23,7 +24,7 @@
         </ul>
     {% endif %}
 
-    <!-- Formulario para agregar al carrito -->
+    
     <form action="{% url 'catalogo:agregar_al_carrito' producto_id=producto.id %}" method="POST" class="formulario-agregar">
         {% csrf_token %}
         <div class="form-group">

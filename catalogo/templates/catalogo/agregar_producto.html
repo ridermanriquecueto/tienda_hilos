@@ -8,31 +8,47 @@
     <h2 class="mb-4">Agregar Nuevo Producto</h2>
     <form method="post" action="{% url 'catalogo:agregar_producto' %}" enctype="multipart/form-data" autocomplete="off">
         {% csrf_token %}
-        
-        <div class="form-group">
-            <label for="nombre">Nombre</label>
-            <input type="text" class="form-control" id="nombre" name="nombre" required>
+
+        {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
         </div>
-        
-        <div class="form-group">
-            <label for="precio">Precio</label>
-            <input type="number" class="form-control" id="precio" name="precio" required>
+        {% endif %}
+
+        <div class="mb-3">
+            {{ form.nombre.label_tag }}
+            {{ form.nombre }}
+            {{ form.nombre.errors }}
         </div>
-        
-        <div class="form-group">
-            <label for="stock">Stock</label>
-            <input type="number" class="form-control" id="stock" name="stock" required>
+        <div class="mb-3">
+            {{ form.precio.label_tag }}
+            {{ form.precio }}
+            {{ form.precio.errors }}
         </div>
-        
-        <div class="form-group">
-            <label for="descripcion">Descripción</label>
-            <textarea class="form-control" id="descripcion" name="descripcion"></textarea>
+        <div class="mb-3">
+            {{ form.stock.label_tag }}
+            {{ form.stock }}
+            {{ form.stock.errors }}
+        </div>
+        <div class="mb-3">
+            {{ form.descripcion.label_tag }}
+            {{ form.descripcion }}
+            {{ form.descripcion.errors }}
+        </div>
+        <div class="mb-3">
+            {{ form.imagen.label_tag }}
+            {{ form.imagen }}
+            {{ form.imagen.errors }}
         </div>
 
-        <!-- Campo para subir la imagen -->
-        <div class="form-group">
-            <label for="imagen">Imagen del Producto</label>
-            <input type="file" class="form-control-file" id="imagen" name="imagen" accept="image/*">
+        <div class="form-check form-switch mb-3">
+            {{ form.destacado }}
+            <label class="form-check-label" for="id_destacado">Destacado</label>
+        </div>
+
+        <div class="form-check form-switch mb-3">
+            {{ form.oferta }}
+            <label class="form-check-label" for="id_oferta">En oferta</label>
         </div>
 
         <button type="submit" class="btn btn-primary">Agregar Producto</button>

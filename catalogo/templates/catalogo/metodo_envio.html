@@ -1,4 +1,4 @@
-<form method="POST" action="{% url 'procesar_envio' %}">
+<form method="POST" action="{% url 'catalogo:procesar_envio' %}">
     {% csrf_token %}
     <label for="envio">Selecciona tu método de envío:</label>
     <select name="envio" id="envio">

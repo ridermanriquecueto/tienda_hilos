@@ -4,23 +4,21 @@
 
 {% block content %}
 <div class="container mt-5">
-    <!-- Caja central con bordes redondeados y sombra -->
+    
     <div class="card shadow-sm">
         <div class="card-body text-center">
-            <!-- Icono de advertencia para llamar la atención -->
+            
             <h1 class="display-4 text-danger"><i class="fas fa-exclamation-triangle"></i></h1>
             <h2 class="card-title">¿Estás seguro de que deseas eliminar este producto?</h2>
             <p class="card-text">No podrás deshacer esta acción.</p>
-            <!-- Mostrando el nombre del producto -->
+            
             <p class="lead font-weight-bold">{{ producto.nombre }}</p>
             
-            <!-- Formulario para eliminar el producto -->
+            
             <form method="post" action="{% url 'catalogo:eliminar_producto' producto.id %}">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-danger btn-lg">Eliminar</button>
-            </form>
-            
-                <a href="{% url 'catalogo:listar_producto' %}" class="btn btn-secondary btn-lg ml-3">Cancelar</a>
+                <a href="{% url 'catalogo:listar_productos' %}" class="btn btn-secondary btn-lg ms-3">Cancelar</a>
             </form>
         </div>
     </div>

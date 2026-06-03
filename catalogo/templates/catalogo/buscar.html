@@ -1,19 +1,53 @@
 {% extends 'base.html' %}
+{% load static product_image_tags %}
 
 {% block title %}Resultados de la búsqueda{% endblock %}
 
 {% block content %}
-<h2>Resultados de la búsqueda para "{{ query }}"</h2>
+<section class="catalogo-section py-5">
+    <div class="container">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3 mb-4">
+            <div>
+                <h1 class="display-5 fw-bold">Resultados de la búsqueda</h1>
+                <p class="lead text-muted">Resultados para "{{ query }}".</p>
+            </div>
+            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success">Ver todo el catálogo</a>
+        </div>
 
-{% if resultados %}
-    <ul>
-        {% for producto in resultados %}
-            <li>
-                <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a> - {{ producto.precio }}
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No se encontraron productos que coincidan con "{{ query }}".</p>
-{% endif %}
+        {% if resultados %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            {% for producto in resultados %}
+            <div class="col">
+                <div class="card card-product h-100 shadow-sm border-0">
+                    <div class="position-relative overflow-hidden product-img-wrapper">
+                        <img src="{{ producto|product_image }}" class="card-img-top producto-imagen" alt="{{ producto.nombre }}">
+                        {% if producto.stock == 0 %}
+                        <span class="badge bg-danger stock-badge">Agotado</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="product-card-content">
+                            {% if producto.categoria %}
+                            <span class="badge bg-info text-dark mb-2">{{ producto.categoria.nombre }}</span>
+                            {% endif %}
+                            <h5 class="card-title">{{ producto.nombre }}</h5>
+                            <p class="card-text text-secondary text-truncate">{{ producto.descripcion }}</p>
+                        </div>
+                        <div class="product-card-footer">
+                            <div class="product-card-meta">
+                                <span class="precio-card">$ {{ producto.precio }}</span>
+                                <span class="badge bg-success">Stock {{ producto.stock }}</span>
+                            </div>
+                            <a href="{% url 'catalogo:detalle_producto' producto.id %}" class="btn btn-outline-primary btn-sm w-100 mt-3">Ver detalle</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-warning">No se encontraron productos que coincidan con "{{ query }}".</div>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}

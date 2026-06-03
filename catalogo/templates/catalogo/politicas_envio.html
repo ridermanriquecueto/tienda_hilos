@@ -7,63 +7,76 @@
     <h1 class="text-center mb-4">Política de Envío</h1>
     <div class="alert alert-info" role="alert">
         <h4 class="alert-heading">Información Importante:</h4>
-        <p>
-            En La Casa de Hilos y Repuestos, ofrecemos envío gratuito para compras superiores a 50,000 pesos.
-        </p>
-        <p>
-            El envío se realiza dentro de un radio de 20 kilómetros desde nuestra tienda utilizando moto, Didi o Uber.
-        </p>
-        <p>
-            Para distancias mayores a 50 kilómetros, el envío será realizado por agencia y el costo correrá por cuenta del comprador.
-        </p>
-        <p>
-            Los productos serán entregados en un plazo máximo de 8 horas después de la compra si la distancia es dentro del radio de 20 km.
-        </p>
-        <hr>
-        <p class="mb-0">
-            Si tienes alguna pregunta, no dudes en <a href="{% url 'contacto' %}">contactarnos</a>.
-        </p>
+        <p>En La Casa de Hilos y Repuestos, ofrecemos envío gratuito para compras superiores a 50,000 pesos...</p>
     </div>
 
-    <!-- Formulario para selección de envío -->
-    <form method="POST" action="{% url 'procesar_envio' %}">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="distancia" class="form-label">Ingresa la distancia en kilómetros:</label>
-            <input type="number" name="distancia" id="distancia" class="form-control" required placeholder="Ej. 10">
-        </div>
-        <div class="mb-3">
-            <label for="envio" class="form-label">Selecciona tu método de envío:</label>
-            <select name="envio" id="envio" class="form-select" required>
-                <option value="moto">Envío en Moto o con Didi/Uber (hasta 20 km)</option>
-                <option value="agencia">Envío por Agencia (más de 50 km)</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="costo_envio" class="form-label">Costo de Envío:</label>
-            <input type="text" name="costo_envio" id="costo_envio" class="form-control" disabled>
-        </div>
-        <button type="submit" class="btn btn-primary">Continuar</button>
-    </form>
+    <div class="card shadow-sm border-0 p-4 mb-4">
+        <h2 class="h4">Términos y condiciones de envío</h2>
+        <ul>
+            <li>Envíos gratuitos en compras superiores a $50,000 dentro de nuestra zona de entrega.</li>
+            <li>Envío a domicilio disponible con moto o auto según la distancia y disponibilidad.</li>
+            <li>Retiro en tienda disponible de lunes a sábado sin costo adicional.</li>
+            <li>Envío por agencia se cotiza según distancia, volumen y fecha de entrega.</li>
+            <li>Los costos de envío pueden variar entre Didi, Uber, moto o agencia.</li>
+            <li>Debe aceptar estas políticas para completar la compra.</li>
+        </ul>
+    </div>
 
-    <!-- Enlace para regresar al checkout -->
+    <div class="card shadow-sm border-0 p-4">
+        <h2 class="h4 mb-3">Calculadora de envío estimado</h2>
+        <form method="POST" action="{% url 'catalogo:politicas_envio' %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="distancia" class="form-label">Distancia en kilómetros</label>
+                <input type="number" name="distancia" id="distancia" class="form-control" required placeholder="Ej. 10">
+            </div>
+            <div class="mb-3">
+                <label for="envio" class="form-label">Método de envío</label>
+                <select name="envio" id="envio" class="form-select" required>
+                    <option value="domicilio">Envío a domicilio</option>
+                    <option value="recoger_tienda">Retirar en tienda</option>
+                    <option value="didi_moto">Envío con moto (Didi)</option>
+                    <option value="uber_moto">Envío con moto (Uber)</option>
+                    <option value="didi_auto">Envío con auto (Didi)</option>
+                    <option value="uber_auto">Envío con auto (Uber)</option>
+                    <option value="agencia">Envío por Agencia</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="costo_envio" class="form-label">Costo estimado</label>
+                <input type="text" id="costo_envio" class="form-control" disabled>
+            </div>
+            <button type="submit" class="btn btn-primary">Verificar envío</button>
+        </form>
+    </div>
+
     <div class="text-center mt-4">
-        <a href="{% url 'checkout' %}" class="btn btn-secondary">Volver al Checkout</a>
+        <a href="{% url 'catalogo:checkout' %}" class="btn btn-secondary">Volver al Checkout</a>
     </div>
 </div>
 
 <script>
-    // Script para calcular el costo de envío según la distancia
     document.getElementById("distancia").addEventListener("input", function() {
         const distancia = parseFloat(this.value);
         const costoEnvioField = document.getElementById("costo_envio");
+        const metodoEnvio = document.getElementById("envio").value;
 
-        if (distancia <= 20) {
-            costoEnvioField.value = "Envío gratuito o costo dependiendo del servicio seleccionado (Didi, Uber, Moto)";
-        } else if (distancia > 20 && distancia <= 50) {
-            costoEnvioField.value = "Costo estimado: 50 soles (por Uber/Didi/Moto)";
-        } else {
-            costoEnvioField.value = "Costo de envío por agencia: A consultar según distancia";
+        if (metodoEnvio === "recoger_tienda") {
+            costoEnvioField.value = "Retiro en tienda sin costo adicional";
+        } else if (["didi_moto", "uber_moto", "didi_auto", "uber_auto", "domicilio"].includes(metodoEnvio)) {
+            if (distancia <= 20) {
+                costoEnvioField.value = "Envío gratuito o costo mínimo según el servicio seleccionado";
+            } else if (distancia > 20 && distancia <= 50) {
+                costoEnvioField.value = "Costo estimado: 50 soles";
+            } else {
+                costoEnvioField.value = "Costo de envío a consultar según distancia";
+            }
+        } else if (metodoEnvio === "agencia") {
+            if (distancia > 50) {
+                costoEnvioField.value = "Costo a consultar según la agencia y distancia";
+            } else {
+                costoEnvioField.value = "No disponible para distancias menores a 50 km";
+            }
         }
     });
 </script>

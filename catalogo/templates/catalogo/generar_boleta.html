@@ -22,12 +22,12 @@
     <h4>Alias de pago:</h4>
     <p>{{ alias }}</p>
 
-    <!-- Opción para imprimir el comprobante -->
+    
     <button onclick="window.print();" class="btn btn-primary">Imprimir Comprobante</button>
 
-    <!-- Volver al checkout -->
+    
     <div class="mt-3">
-        <a href="{% url 'checkout' %}" class="btn btn-secondary">Volver al Checkout</a>
+        <a href="{% url 'catalogo:checkout' %}" class="btn btn-secondary">Volver al Checkout</a>
     </div>
 
 {% endblock %}

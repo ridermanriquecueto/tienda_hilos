@@ -1,34 +1,130 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static product_image_tags %}
 
 {% block title %}Inicio - La Casa de Hilos y Repuestos{% endblock %}
 
 {% block content %}
-
-<section id="hero">
-    <h2>Bienvenido a la mejor tienda de hilos y repuestos para toda confección</h2>
-    <p>Descubre nuestra amplia variedad de productos de alta calidad para todas tus necesidades de costura.</p>
-
-    <div class="formulario-inicio">
-        <div class="icons-container">
-            <a href="https://wa.me/542216769436" target="_blank" class="whatsapp-icon">
-                <img src="{% static 'images/whatsapp-64.webp' %}" alt="WhatsApp">
-            </a>
-            <a href="{% url 'catalogo:ver_carrito' %}" class="cart-icon">
-                <img src="{% static 'images/carro.jpg' %}" alt="Carrito de Compras">
-            </a>
-            <div class="map-icon">
-                <a href="https://maps.google.com/maps?q=-34.9200676%2C-58.0028568&z=17&hl=es" target="_blank">
-                    <button>Cómo llegar</button>
-                </a>
+<section class="formulario-inicio mb-5">
+    <div class="container h-100 d-flex align-items-center justify-content-center text-center text-white">
+        <div class="py-5">
+            <h1 class="display-4 fw-bold">Bienvenido a La Casa de Hilos y Repuestos</h1>
+            <p class="lead mb-4">Descubre hilos, accesorios y repuestos de calidad para tus proyectos de confección.</p>
+            <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success btn-lg">Ver catálogo</a>
+                <a href="{% url 'catalogo:ver_carrito' %}" class="btn btn-outline-light btn-lg">Mi carrito</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'catalogo:logout' %}" class="btn btn-light btn-lg text-primary">Cerrar sesión</a>
+                {% else %}
+                    <a href="{% url 'catalogo:login' %}?next={% url 'catalogo:inicio' %}" class="btn btn-outline-light btn-lg">Iniciar sesión</a>
+                {% endif %}
             </div>
+            {% if user.is_authenticated %}
+                <p class="mt-3 text-white-75">
+                    Hola, {{ user.first_name|default:user.username }}
+                    {% if user.is_staff %}
+                        <span class="badge bg-warning text-dark ms-2 badge-staff">STAFF</span>
+                    {% endif %}
+                    . Ya puedes gestionar tu carrito o ver productos.
+                </p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="container my-5">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start mb-4 gap-3">
+        <div>
+            <h2 class="fw-bold">Productos destacados</h2>
+            <p class="text-muted">Estos artículos están disponibles en catálogo y en la base de datos.</p>
+            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-success btn-lg me-2">Ver catálogo</a>
+            <a href="{% url 'catalogo:ver_carrito' %}" class="btn btn-outline-light btn-lg me-2"><i class="fas fa-shopping-cart"></i> Mi carrito</a>
+            <a href="https://wa.me/542216769436" target="_blank" class="btn btn-outline-light btn-lg me-2"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <a href="{% url 'catalogo:contacto' %}" class="btn btn-link text-white">Cómo llegar</a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        {% for producto in productos|slice:":6" %}
+        <div class="col">
+            <div class="card card-product h-100 shadow-sm border-0">
+                <div class="position-relative overflow-hidden product-img-wrapper">
+                    <img src="{{ producto|product_image }}" class="card-img-top producto-imagen" alt="{{ producto.nombre }}">
+                    {% if producto.stock == 0 %}
+                    <span class="badge bg-danger stock-badge">Agotado</span>
+                    {% endif %}
+        {% endfor %}
+        <div class="btn-group" role="group">
+            <button id="btnDestacados" class="btn btn-outline-success">Ver productos destacados</button>
+            <button id="btnOferta" class="btn btn-outline-warning">Oferta de la semana</button>
+            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-outline-success">Ver todo el catálogo</a>
+        </div>
+                </div>
+    <div id="destacados" style="display:none;">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            {% for producto in destacados %}
+            <div class="col">
+                <div class="card card-product h-100 shadow-sm border-0">
+                    <div class="position-relative overflow-hidden product-img-wrapper">
+                        <img src="{{ producto|product_image }}" class="card-img-top producto-imagen" alt="{{ producto.nombre }}">
+                        {% if producto.stock == 0 %}
+                        <span class="badge bg-danger stock-badge">Agotado</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                        <p class="card-text text-secondary text-truncate">{{ producto.descripcion }}</p>
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <p class="precio-card mb-0"><strong>$ {{ producto.precio }}</strong></p>
+                            <span class="small text-muted">Stock: {{ producto.stock }}</span>
+                        </div>
+                        <a href="{% url 'catalogo:detalle_producto' producto.id %}" class="btn btn-success btn-sm w-100 mt-3">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-warning">No hay productos disponibles en este momento.</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+
+    <div id="ofertas" style="display:none; margin-top:20px;">
+        <h3>Ofertas de la semana</h3>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+            {% for producto in ofertas %}
+            <div class="col">
+                <div class="card card-product h-100 shadow-sm border-0">
+                    <div class="position-relative overflow-hidden product-img-wrapper">
+                        <img src="{{ producto|product_image }}" class="card-img-top producto-imagen" alt="{{ producto.nombre }}">
+                        {% if producto.stock == 0 %}
+                        <span class="badge bg-danger stock-badge">Agotado</span>
+                        {% endif %}
+                        <div class="ribbon">Oferta</div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.nombre }}</h5>
+                        <p class="card-text text-secondary text-truncate">{{ producto.descripcion }}</p>
+                        <div class="mt-auto d-flex justify-content-between align-items-center">
+                            <p class="precio-card mb-0"><strong>$ {{ producto.precio }}</strong></p>
+                            <span class="small text-muted">Stock: {{ producto.stock }}</span>
+                        </div>
+                        <a href="{% url 'catalogo:detalle_producto' producto.id %}" class="btn btn-warning btn-sm w-100 mt-3">Ver detalle</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 
-    <p>
-        <a href="{% url 'catalogo:catalogo' %}">Ver Catálogo</a>  <!-- Debe coincidir con el nombre en urls.py -->
-
-    </p>
-</section>
-
+    <script>
+        document.getElementById('btnDestacados').addEventListener('click', function(){
+            document.getElementById('destacados').style.display = 'block';
+            document.getElementById('ofertas').style.display = 'none';
+        });
+        document.getElementById('btnOferta').addEventListener('click', function(){
+            document.getElementById('ofertas').style.display = 'block';
+            document.getElementById('destacados').style.display = 'none';
+        });
+    </script>
 {% endblock %}

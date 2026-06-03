@@ -1,85 +1,107 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Confirmación de Compra</title>
-    <script>
-        // Función que muestra u oculta los campos dependiendo del método de pago seleccionado
-        function mostrarCamposPago() {
-            var metodo_pago = document.getElementById('metodo_pago').value;
-            
-            // Ocultar ambos campos al inicio
-            document.getElementById('campo_alias_mercado_pago').style.display = 'none';
-            document.getElementById('campo_numero_tarjeta').style.display = 'none';
-            
-            // Mostrar los campos correspondientes dependiendo del método de pago
-            if (metodo_pago == 'mercado_pago') {
-                document.getElementById('campo_alias_mercado_pago').style.display = 'block';
-            } else if (metodo_pago == 'cuenta_dni') {
-                document.getElementById('campo_numero_tarjeta').style.display = 'block';
-            }
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de Compra</title>
+  <script>
+    function mostrarCamposPago() {
+      const metodo = document.getElementById('metodo_pago').value;
 
-        // Llamamos a la función para mostrar los campos al cargar la página
-        window.onload = function() {
-            mostrarCamposPago();
-        };
-    </script>
+      // Ocultamos todos los formularios
+      const formularios = ['form_mercado_pago', 'form_cuenta_dni', 'form_transferencia', 'form_tarjeta'];
+      formularios.forEach(id => document.getElementById(id).style.display = 'none');
+
+      // Mostramos según método
+      if (metodo === 'mercado_pago') {
+        document.getElementById('form_mercado_pago').style.display = 'block';
+      } else if (metodo === 'cuenta_dni') {
+        document.getElementById('form_cuenta_dni').style.display = 'block';
+      } else if (metodo === 'transferencia') {
+        document.getElementById('form_transferencia').style.display = 'block';
+      } else if (metodo === 'tarjeta') {
+        document.getElementById('form_tarjeta').style.display = 'block';
+      }
+    }
+
+    window.onload = mostrarCamposPago;
+  </script>
 </head>
 <body>
-    <h1>Confirmación de Compra</h1>
 
-    {% if carrito %}
-        <h2>Resumen de tu compra:</h2>
-        <ul>
-            {% for producto in carrito.productos.all %}
-                <li>{{ producto.nombre }} - {{ producto.cantidad }} x {{ producto.precio }} = {{ producto.cantidad * producto.precio }}</li>
-            {% endfor %}
-        </ul>
-        <p>Total: ${{ total }}</p>
-        <p>Gracias por tu compra.</p>
-    {% else %}
-        <p>No tienes productos en tu carrito.</p>
-    {% endif %}
-    
-    <form method="POST" action="{% url 'catalogo:confirmar_compra' %}">
-        {% csrf_token %}
-        
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" name="nombre" required><br>
-    
-        <label for="direccion">Dirección:</label>
-        <input type="text" id="direccion" name="direccion" required><br>
-    
-        <label for="telefono">Teléfono:</label>
-        <input type="text" id="telefono" name="telefono" required><br>
-    
-        <label for="metodo_pago">Método de Pago:</label>
-        <select id="metodo_pago" name="metodo_pago" required onchange="mostrarCamposPago()">
-            <option value="mercado_pago">Mercado Pago</option>
-            <option value="cuenta_dni">Cuenta DNI</option>
-            <option value="transferencia">Transferencia</option>
-        </select><br>
-    
-        <!-- Campos para métodos de pago específicos -->
-        <div id="campo_alias_mercado_pago" style="display: none;">
-            <label for="alias_mercado_pago">Alias Mercado Pago:</label>
-            <input type="text" id="alias_mercado_pago" name="alias_mercado_pago"><br>
-        </div>
-    
-        <div id="campo_numero_tarjeta" style="display: none;">
-            <label for="numero_tarjeta">Número de tarjeta:</label>
-            <input type="text" id="numero_tarjeta" name="numero_tarjeta"><br>
-        </div>
-    
-        <label for="metodo_envio">Método de Envío:</label>
-        <select id="metodo_envio" name="metodo_envio">
-            <option value="domicilio">Domicilio</option>
-            <option value="retiro_en_tienda">Retiro en tienda</option>
-        </select><br>
-    
-        <input type="submit" value="Confirmar Compra">
-    </form>
+<h1>Confirmación de Compra</h1>
+
+<form method="POST" action="{% url 'catalogo:confirmar_compra' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  
+  <label for="nombre">Nombre:</label>
+  <input type="text" id="nombre" name="nombre" required><br>
+
+  <label for="direccion">Dirección:</label>
+  <input type="text" id="direccion" name="direccion" required><br>
+
+  <label for="telefono">Teléfono:</label>
+  <input type="text" id="telefono" name="telefono" required><br>
+
+  
+  <label for="metodo_pago">Método de Pago:</label>
+  <select id="metodo_pago" name="metodo_pago" onchange="mostrarCamposPago()" required>
+    <option value="mercado_pago">Mercado Pago</option>
+    <option value="cuenta_dni">Cuenta DNI</option>
+    <option value="transferencia">Transferencia Bancaria</option>
+    <option value="tarjeta">Tarjeta de Crédito</option>
+  </select><br>
+
+  
+  <div id="form_mercado_pago" style="display:none;">
+    <h4>Datos de Mercado Pago</h4>
+    <label for="alias_mercado">Alias:</label>
+    <input type="text" name="alias_mercado" id="alias_mercado"><br>
+    <label for="qr_mercado">Escanear QR:</label>
+    <input type="file" name="qr_mercado" id="qr_mercado"><br>
+  </div>
+
+  
+  <div id="form_cuenta_dni" style="display:none;">
+    <h4>Datos Cuenta DNI</h4>
+    <label for="alias_dni">Alias:</label>
+    <input type="text" name="alias_dni" id="alias_dni"><br>
+    <label for="cbu_dni">CBU:</label>
+    <input type="text" name="cbu_dni" id="cbu_dni"><br>
+    <label for="qr_dni">Escanear QR:</label>
+    <input type="file" name="qr_dni" id="qr_dni"><br>
+    <label for="comprobante_dni">Comprobante:</label>
+    <input type="file" name="comprobante_dni" id="comprobante_dni"><br>
+  </div>
+
+  
+  <div id="form_transferencia" style="display:none;">
+    <h4>Datos Transferencia</h4>
+    <label for="alias_transferencia">Alias:</label>
+    <input type="text" name="alias_transferencia" id="alias_transferencia"><br>
+    <label for="cbu_transferencia">CBU:</label>
+    <input type="text" name="cbu_transferencia" id="cbu_transferencia"><br>
+    <label for="comprobante_transferencia">Comprobante:</label>
+    <input type="file" name="comprobante_transferencia" id="comprobante_transferencia"><br>
+  </div>
+
+  
+  <div id="form_tarjeta" style="display:none;">
+    <h4>Pago con Tarjeta</h4>
+    <label for="numero_tarjeta">Número de Tarjeta:</label>
+    <input type="text" name="numero_tarjeta" id="numero_tarjeta"><br>
+  </div>
+
+  
+  <label for="metodo_envio">Método de Envío:</label>
+  <select id="metodo_envio" name="metodo_envio">
+    <option value="domicilio">Domicilio</option>
+    <option value="retiro_en_tienda">Retiro en tienda</option>
+  </select><br><br>
+
+  <input type="submit" value="Confirmar Compra">
+</form>
+
 </body>
 </html>

@@ -1,73 +1,92 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load static product_image_tags %}
 
 {% block title %}Productos - La Casa de Hilos y Repuestos{% endblock %}
 
 {% block content %}
-<h1>Listado de Productos</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Listado de Productos</h1>
+    {% if user.is_staff %}
+    <a href="{% url 'catalogo:agregar_producto' %}" class="btn btn-success">Agregar Producto</a>
+    {% endif %}
+</div>
 
 <form method="post" action="{% url 'catalogo:eliminar_productos' %}">
     {% csrf_token %}
     <table class="table table-striped">
         <thead>
             <tr>
+                {% if user.is_staff %}
                 <th scope="col">
                     <input type="checkbox" id="select-all"> Seleccionar
                 </th>
+                {% endif %}
                 <th scope="col">#</th>
                 <th scope="col">Imagen</th>
                 <th scope="col">Nombre</th>
                 <th scope="col">Precio</th>
+                {% if user.is_staff %}
                 <th scope="col">Acciones</th>
+                {% endif %}
             </tr>
         </thead>
-        <tbody>
+        <tbody class="animate-list">
             {% for producto in productos %}
-                <tr>
+                <tr class="animate-item">
+                    {% if user.is_staff %}
                     <td><input type="checkbox" name="productos" value="{{ producto.id }}" class="select-product"></td>
+                    {% endif %}
                     <td>{{ forloop.counter }}</td>
                     <td>
-                        {% if producto.imagen %}
-                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" width="50">
-                        {% else %}
-                            <span>Sin imagen</span>
-                        {% endif %}
+                        <img src="{{ producto|product_image }}" alt="{{ producto.nombre }}" width="50">
                     </td>
                     <td>{{ producto.nombre }}</td>
                     <td>${{ producto.precio }}</td>
+                    {% if user.is_staff %}
                     <td>
-                        <a href="{% url 'catalogo:actualizar_producto' producto.pk %}">Actualizar</a>
-                        <a href="{% url 'catalogo:eliminar_producto' producto.pk %}" 
-                           onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">Eliminar</a>
+                        <a class="btn btn-sm btn-outline-primary me-1" href="{% url 'catalogo:actualizar_producto' producto.pk %}" title="Actualizar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'catalogo:eliminar_producto' producto.pk %}" 
+                           onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');" title="Eliminar">
+                           <i class="fas fa-trash-alt"></i>
+                        </a>
                     </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
     </table>
     
-    <!-- Botón para eliminar los productos seleccionados -->
+    
+    {% if user.is_staff %}
     <button type="submit" class="btn btn-danger" id="eliminar-button" style="display:none;">Eliminar seleccionados</button>
+    {% endif %}
 </form>
-
+{% if user.is_staff %}
 <script type="text/javascript">
     // Seleccionar/deseleccionar todos los productos
-    document.getElementById('select-all').addEventListener('change', function(e) {
-        const checkboxes = document.querySelectorAll('.select-product');
-        checkboxes.forEach((checkbox) => {
-            checkbox.checked = e.target.checked;
+    const selectAll = document.getElementById('select-all');
+    if (selectAll) {
+        selectAll.addEventListener('change', function(e) {
+            const checkboxes = document.querySelectorAll('.select-product');
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = e.target.checked;
+            });
+            toggleDeleteButton();
         });
-        toggleDeleteButton();
-    });
 
-    // Verificar si hay productos seleccionados y mostrar el botón de eliminar
-    document.querySelectorAll('.select-product').forEach((checkbox) => {
-        checkbox.addEventListener('change', toggleDeleteButton);
-    });
+        // Verificar si hay productos seleccionados y mostrar el botón de eliminar
+        document.querySelectorAll('.select-product').forEach((checkbox) => {
+            checkbox.addEventListener('change', toggleDeleteButton);
+        });
 
-    function toggleDeleteButton() {
-        const selected = document.querySelectorAll('.select-product:checked').length;
-        document.getElementById('eliminar-button').style.display = selected > 0 ? "inline-block" : "none";
+        function toggleDeleteButton() {
+            const selected = document.querySelectorAll('.select-product:checked').length;
+            document.getElementById('eliminar-button').style.display = selected > 0 ? "inline-block" : "none";
+        }
     }
 </script>
+{% endif %}
 
 {% endblock %}

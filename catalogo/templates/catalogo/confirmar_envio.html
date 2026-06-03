@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Confirmación de Envío - La Casa de Hilos y Repuestos{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm border-0 p-4">
+        <h1 class="h3 mb-4">Confirmación de Envío</h1>
+        <p><strong>Método de envío:</strong> {{ metodo_envio|default:'No seleccionado' }}</p>
+        <p><strong>Distancia estimada:</strong> {{ distancia|default:'N/D' }} km</p>
+        <p><strong>Costo de envío:</strong> {{ costo_envio|default:'A consultar' }}</p>
+        <div class="mt-4">
+            <a href="{% url 'catalogo:checkout' %}" class="btn btn-secondary">Volver al Checkout</a>
+            <a href="{% url 'catalogo:politicas_envio' %}" class="btn btn-link">Ver políticas de envío</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

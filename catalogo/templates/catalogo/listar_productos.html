@@ -11,63 +11,95 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                {% if user.is_staff %}
                 <th scope="col">
                     <input type="checkbox" id="select-all"> Seleccionar
                 </th>
+                {% endif %}
                 <th scope="col">#</th>
                 <th scope="col">Imagen</th>
                 <th scope="col">Nombre</th>
                 <th scope="col">Precio</th>
+                {% if user.is_staff %}
                 <th scope="col">Acciones</th>
+                {% endif %}
             </tr>
         </thead>
-        <tbody>
+        <tbody class="animate-list">
             {% for producto in productos %}
-                <tr>
+                <tr class="animate-item">
+                    {% if user.is_staff %}
                     <td><input type="checkbox" name="productos" value="{{ producto.id }}" class="select-product"></td>
+                    {% endif %}
                     <td>{{ forloop.counter }}</td>
                     <td>
-                        {% if producto.imagen %}
-                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" width="50">
-                        {% else %}
-                            <span>Sin imagen</span>
-                        {% endif %}
+                        <img src="{{ producto|product_image }}" alt="{{ producto.nombre }}" width="50">
                     </td>
                     <td>{{ producto.nombre }}</td>
                     <td>${{ producto.precio }}</td>
+                    {% if user.is_staff %}
                     <td>
-                        <a href="{% url 'catalogo:actualizar_producto' producto.pk %}">Actualizar</a>
-                        <a href="{% url 'catalogo:eliminar_producto' producto.pk %}" 
-                           onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">Eliminar</a>
+                        <a class="btn btn-sm btn-outline-primary me-1" href="{% url 'catalogo:actualizar_producto' producto.pk %}" title="Actualizar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a class="btn btn-sm btn-outline-danger" href="{% url 'catalogo:eliminar_producto' producto.pk %}" 
+                           onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');" title="Eliminar">
+                           <i class="fas fa-trash-alt"></i>
+                        </a>
                     </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
     </table>
     
-    <!-- Botón para eliminar los productos seleccionados -->
-    <button type="submit" class="btn btn-danger" id="eliminar-button" style="display:none;">Eliminar seleccionados</button>
+    {% if user.is_staff %}
+    <div class="d-flex gap-2">
+        <button type="submit" formaction="{% url 'catalogo:eliminar_productos' %}" class="btn btn-danger" id="eliminar-button" style="display:none;">Eliminar seleccionados</button>
+        <button type="submit" formaction="{% url 'catalogo:marcar_productos' %}" name="accion" value="marcar_oferta" class="btn btn-warning" id="marcar-oferta" style="display:none;">Marcar Oferta</button>
+        <button type="submit" formaction="{% url 'catalogo:marcar_productos' %}" name="accion" value="quitar_oferta" class="btn btn-secondary" id="quitar-oferta" style="display:none;">Quitar Oferta</button>
+        <button type="submit" formaction="{% url 'catalogo:marcar_productos' %}" name="accion" value="marcar_destacado" class="btn btn-success" id="marcar-destacado" style="display:none;">Marcar Destacado</button>
+        <button type="submit" formaction="{% url 'catalogo:marcar_productos' %}" name="accion" value="quitar_destacado" class="btn btn-outline-secondary" id="quitar-destacado" style="display:none;">Quitar Destacado</button>
+    </div>
+    {% endif %}
+    {% if user.is_staff and last_batch_action %}
+    <div class="mt-3">
+        <form method="post" action="{% url 'catalogo:deshacer_ultima_accion' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-danger">Deshacer última acción</button>
+        </form>
+    </div>
+    {% endif %}
 </form>
-
+{% if user.is_staff %}
 <script type="text/javascript">
     // Seleccionar/deseleccionar todos los productos
-    document.getElementById('select-all').addEventListener('change', function(e) {
-        const checkboxes = document.querySelectorAll('.select-product');
-        checkboxes.forEach((checkbox) => {
-            checkbox.checked = e.target.checked;
+    const selectAll = document.getElementById('select-all');
+    if (selectAll) {
+        selectAll.addEventListener('change', function(e) {
+            const checkboxes = document.querySelectorAll('.select-product');
+            checkboxes.forEach((checkbox) => {
+                checkbox.checked = e.target.checked;
+            });
+            toggleActionButtons();
         });
-        toggleDeleteButton();
-    });
 
-    // Verificar si hay productos seleccionados y mostrar el botón de eliminar
-    document.querySelectorAll('.select-product').forEach((checkbox) => {
-        checkbox.addEventListener('change', toggleDeleteButton);
-    });
+        // Verificar si hay productos seleccionados y mostrar los botones de acción
+        document.querySelectorAll('.select-product').forEach((checkbox) => {
+            checkbox.addEventListener('change', toggleActionButtons);
+        });
 
-    function toggleDeleteButton() {
-        const selected = document.querySelectorAll('.select-product:checked').length;
-        document.getElementById('eliminar-button').style.display = selected > 0 ? "inline-block" : "none";
+        function toggleActionButtons() {
+            const selected = document.querySelectorAll('.select-product:checked').length;
+            const show = selected > 0 ? "inline-block" : "none";
+            document.getElementById('eliminar-button').style.display = show;
+            document.getElementById('marcar-oferta').style.display = show;
+            document.getElementById('quitar-oferta').style.display = show;
+            document.getElementById('marcar-destacado').style.display = show;
+            document.getElementById('quitar-destacado').style.display = show;
+        }
     }
 </script>
+{% endif %}
 
 {% endblock %}

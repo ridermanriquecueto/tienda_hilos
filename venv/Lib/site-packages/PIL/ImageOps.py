@@ -698,11 +698,10 @@ def exif_transpose(image: Image.Image, *, in_place: bool = False) -> Image.Image
         8: Image.Transpose.ROTATE_90,
     }.get(orientation)
     if method is not None:
+        transposed_image = image.transpose(method)
         if in_place:
-            image.im = image.im.transpose(method)
-            image._size = image.im.size
-        else:
-            transposed_image = image.transpose(method)
+            image.im = transposed_image.im
+            image._size = transposed_image._size
         exif_image = image if in_place else transposed_image
 
         exif = exif_image.getexif()

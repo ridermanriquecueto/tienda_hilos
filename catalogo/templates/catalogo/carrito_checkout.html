@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Carrito y Checkout - La Casa de Hilos{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row">
+    <div class="col-md-7">
+      <h3>Tu Carrito ({{ total_productos }} items)</h3>
+      {% if mensaje_stock %}
+      <div class="alert alert-warning">{{ mensaje_stock }}</div>
+      {% endif %}
+      <ul class="list-group mb-3">
+        {% for it in items %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <strong>{{ it.producto.nombre }}</strong>
+            <div class="small text-muted">{{ it.producto.descripcion }}</div>
+            <div class="small">Cantidad: {{ it.cantidad }}</div>
+          </div>
+          <div class="text-end">
+            <div>${{ it.subtotal }}</div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      <p class="h5">Total: <strong>$ {{ total }}</strong></p>
+    </div>
+    <div class="col-md-5">
+      <h3>Checkout</h3>
+      <form method="POST" action="{% url 'catalogo:confirmar_compra' %}">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="mb-2">
+          {{ form.nombre.label_tag }}
+          {{ form.nombre }}
+          {{ form.nombre.errors }}
+        </div>
+        <div class="mb-2">
+          {{ form.direccion.label_tag }}
+          {{ form.direccion }}
+          {{ form.direccion.errors }}
+        </div>
+        <div class="mb-2">
+          {{ form.telefono.label_tag }}
+          {{ form.telefono }}
+          {{ form.telefono.errors }}
+        </div>
+        <div class="mb-2">
+          {{ form.metodo_pago.label_tag }}
+          {{ form.metodo_pago }}
+          {{ form.metodo_pago.errors }}
+        </div>
+        <div class="mb-2">
+          {{ form.metodo_envio.label_tag }}
+          {{ form.metodo_envio }}
+          {{ form.metodo_envio.errors }}
+        </div>
+        <button type="submit" class="btn btn-success w-100">Finalizar Compra y Generar Comprobante</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

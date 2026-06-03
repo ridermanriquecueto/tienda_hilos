@@ -95,7 +95,7 @@ class FtexImageFile(ImageFile.ImageFile):
             self._mode = "RGBA"
             self.tile = [ImageFile._Tile("bcn", (0, 0) + self.size, 0, (1,))]
         elif format == Format.UNCOMPRESSED:
-            self.tile = [ImageFile._Tile("raw", (0, 0) + self.size, 0, "RGB")]
+            self.tile = [ImageFile._Tile("raw", (0, 0) + self.size, 0, ("RGB", 0, 1))]
         else:
             msg = f"Invalid texture compression format: {repr(format)}"
             raise ValueError(msg)

@@ -62,7 +62,7 @@ class ImtImageFile(ImageFile.ImageFile):
                         "raw",
                         (0, 0) + self.size,
                         self.fp.tell() - len(buffer),
-                        self.mode,
+                        (self.mode, 0, 1),
                     )
                 ]
 
